@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import GameStreamScreen from '../screens/game/GameStreamScreen';
 import GameDetailScreen from '../screens/game/GameDetailScreen';
@@ -31,8 +32,20 @@ export type MainStackParamList = {
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 const MainNavigator: React.FC = () => {
+  // For web preview: Set GameSummary as initial route
+  // For production/mobile, start with GameStream
+  // To preview with real data, replace testGameId with an actual gameId from your Supabase database
+  const initialRouteName = Platform.OS === 'web' && __DEV__ 
+    ? 'GameSummary' 
+    : 'GameStream';
+
+  // Test gameId for preview - IMPORTANT: Replace with actual gameId from your Supabase database
+  // You can find game IDs in your Supabase dashboard → Table Editor → games table
+  const testGameId = process.env.EXPO_PUBLIC_TEST_GAME_ID || 'test-game-id-123';
+
   return (
     <Stack.Navigator
+      initialRouteName={initialRouteName}
       screenOptions={{
         headerStyle: {
           backgroundColor: '#FF6B35',
@@ -62,6 +75,7 @@ const MainNavigator: React.FC = () => {
         name="GameSummary"
         component={GameSummaryScreen}
         options={{ title: 'Box Score' }}
+        initialParams={initialRouteName === 'GameSummary' ? { gameId: testGameId } : undefined}
       />
       <Stack.Screen
         name="TeamList"
