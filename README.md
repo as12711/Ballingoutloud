@@ -1,132 +1,371 @@
-# Balling Out Loud
+# Balling Out Loud - Setup Guide
 
-## StatTrack
+## Getting Started with GitHub Copilot & Cursor
 
-> Capture, analyze, and share high school sports statistics in real-time
+This guide will walk you through setting up the entire project from scratch.
 
-## Overview
+## Prerequisites
 
-StatTrack by Balling Out Loud is a mobile application designed to bring professional-grade statistics tracking to high school athletics. Built for coaches, players, parents, and fans, StatTrack makes it easy to record game data, generate insights, and celebrate athletic achievement at the prep level.
+Before you begin, make sure you have:
 
-## Features
-
-### Core Functionality
-- **Real-time Stat Entry**: Intuitive interface for recording stats during live games
-- **Multi-Sport Support**: Track basketball, football, baseball, soccer, and more
-- **Player Profiles**: Comprehensive athlete statistics and performance history
-- **Team Management**: Roster organization and season-long tracking
-- **Live Game Updates**: Share real-time stats with fans and families
-- **Analytics Dashboard**: Visualize performance trends and identify key insights
-
-### For Different Users
-- **Coaches**: Track player development, make data-driven decisions
-- **Players**: Monitor personal performance and set improvement goals
-- **Parents**: Follow your athlete's progress and game performance
-- **Fans**: Stay connected with live stats and season highlights
-
-## Tech Stack
-
-- **Frontend**: React Native (iOS & Android)
-- **Backend**: Node.js
-- **Database**: Supabase
-- **Authentication**: Supabase Auth
-- **Development**: Expo
-
-## Getting Started
-
-### Prerequisites
-- Node.js (v18 or higher)
+- Node.js (v18 or higher) - [Download here](https://nodejs.org/)
 - npm or yarn
-- Expo CLI
-- iOS Simulator (Mac) or Android Studio (for development)
+- Git
+- GitHub account
+- Supabase account (free tier) - [Sign up here](https://supabase.com)
+- iOS Simulator (Mac) or Android Studio (Windows/Mac/Linux)
+- VS Code with GitHub Copilot extension OR Cursor IDE
 
-### Installation
+## Step 1: Initialize the Project
+
+### Create Expo App
 
 ```bash
-# Clone the repository
-git clone https://github.com/BallingOutLoud/stattrack.git
+# Navigate to your projects directory
+cd ~/projects
 
-# Navigate to project directory
-cd stattrack
+# Create new Expo app
+npx create-expo-app balling-out-loud --template blank-typescript
 
-# Install dependencies
-npm install
+# Navigate into project
+cd balling-out-loud
 
-# Start development server
-npx expo start
+# Open in your editor
+code .  # for VS Code
+# OR
+cursor . # for Cursor
 ```
 
-### Environment Setup
+## Step 2: Install Dependencies
+
+```bash
+# Core dependencies
+npm install @supabase/supabase-js
+npm install @react-navigation/native @react-navigation/native-stack @react-navigation/bottom-tabs
+npm install react-native-screens react-native-safe-area-context
+npm install react-native-paper
+npm install @reduxjs/toolkit react-redux
+npm install @tanstack/react-query
+npm install react-hook-form
+npm install date-fns
+npm install expo-image-picker expo-document-picker
+
+# Development dependencies
+npm install --save-dev @types/react @types/react-native
+npm install --save-dev eslint prettier
+npm install --save-dev @typescript-eslint/eslint-plugin @typescript-eslint/parser
+```
+
+## Step 3: Set Up Supabase
+
+### 3.1 Create Supabase Project
+
+1. Go to [supabase.com](https://supabase.com)
+2. Click "Start your project"
+3. Create a new organization (if you don't have one)
+4. Create a new project:
+   - Project name: `balling-out-loud`
+   - Database password: (generate and save securely)
+   - Region: Choose closest to you
+
+### 3.2 Run Database Migration
+
+1. In Supabase dashboard, go to SQL Editor
+2. Copy the contents of `supabase_migration.sql` (provided in framework files)
+3. Paste into SQL Editor and click "Run"
+4. Wait for all tables to be created
+
+### 3.3 Get API Keys
+
+1. In Supabase dashboard, go to Settings > API
+2. Copy the following:
+   - Project URL
+   - `anon` public key
+
+## Step 4: Configure Environment Variables
 
 Create a `.env` file in the root directory:
 
-```env
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+```bash
+# .env
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-## Project Structure
+**Important**: Add `.env` to your `.gitignore`:
 
-```
-stattrack/
-├── app/                    # Main application screens
-├── components/             # Reusable UI components
-├── services/              # API and backend services
-├── utils/                 # Helper functions and utilities
-├── assets/                # Images, fonts, and static files
-├── config/                # Configuration files
-└── types/                 # TypeScript type definitions
+```bash
+echo ".env" >> .gitignore
 ```
 
-## Roadmap
+## Step 5: Create Project Structure
 
-### Phase 1: MVP (Current)
-- [x] User authentication
-- [ ] Basic stat entry (basketball)
-- [ ] Player profiles
-- [ ] Team management
-- [ ] Game creation and tracking
+```bash
+# Create directory structure
+mkdir -p src/{api,components/{common,game,stats,player},screens/{auth,game,team,player,profile},navigation,store/slices,hooks,utils,types,config}
+mkdir -p assets/{images,fonts,icons}
 
-### Phase 2: Enhanced Features
-- [ ] Multi-sport support
-- [ ] Advanced analytics
-- [ ] Social sharing
-- [ ] Push notifications
-- [ ] Export reports (PDF/CSV)
+# Create placeholder files (Copilot will help fill these in)
+touch src/config/supabase.ts
+touch src/config/theme.ts
+touch src/types/index.ts
+touch src/store/store.ts
+touch src/navigation/AppNavigator.tsx
+```
 
-### Phase 3: Community
-- [ ] Public player profiles
-- [ ] Leaderboards
-- [ ] Recruiting features
-- [ ] Video highlights integration
+## Step 6: Configure Supabase Client
 
-## Contributing
+Create `src/config/supabase.ts`:
 
-We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help is appreciated.
+```typescript
+import { createClient } from '@supabase/supabase-js';
+import Constants from 'expo-constants';
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+const supabaseUrl = Constants.expoConfig?.extra?.supabaseUrl || '';
+const supabaseAnonKey = Constants.expoConfig?.extra?.supabaseAnonKey || '';
 
-## License
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+});
+```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Update `app.config.js`:
 
-## Contact
+```javascript
+export default {
+  expo: {
+    name: "Balling Out Loud",
+    slug: "balling-out-loud",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/icon.png",
+    userInterfaceStyle: "light",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#ffffff"
+    },
+    extra: {
+      supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
+      supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    },
+    // ... rest of config
+  }
+};
+```
 
-**Organization**: Balling Out Loud  
-**Project Lead**: Aunray  
-**Email**: [your-email]  
-**GitHub**: [@BallingOutLoud](https://github.com/BallingOutLoud)
+## Step 7: Using GitHub Copilot Effectively
 
-## Acknowledgments
+### Copilot Best Practices
 
-- Inspired by the need for accessible sports analytics at the high school level
-- Built with support from the NYU computer science community
-- Special thanks to coaches and athletes who provided feedback during development
+1. **Write descriptive comments first**:
+   ```typescript
+   // Create a function that fetches all games from Supabase
+   // Filter by status and date range
+   // Return sorted by scheduled_at ascending
+   ```
+
+2. **Use meaningful file names**: Copilot uses context from file names
+
+3. **Keep functions focused**: One function, one purpose
+
+4. **Use TypeScript types**: Copilot works better with types
+
+### Example Copilot Workflow
+
+```typescript
+// src/api/games.ts
+
+// Import supabase client
+import { supabase } from '../config/supabase';
+import { Game, GameWithTeams } from '../types';
+
+// Function to fetch upcoming games
+export const fetchUpcomingGames = async (): Promise<GameWithTeams[]> => {
+  // [Copilot will suggest the rest]
+```
+
+## Step 8: Using Cursor for Complex Tasks
+
+### When to Switch to Cursor
+
+Use Cursor for:
+- Multi-file refactoring
+- Large component generation
+- Codebase-wide changes
+- Complex state management setup
+- Navigation configuration
+
+### Cursor Commands
+
+In Cursor, use Cmd+K (Mac) or Ctrl+K (Windows) to open the AI panel:
+
+```
+Prompt examples:
+"Create a Redux store with slices for auth, games, and stats"
+"Set up React Navigation with nested navigators"
+"Refactor this component to use React Query for data fetching"
+"Add error handling and loading states to all API calls"
+```
+
+## Step 9: Development Workflow
+
+### Daily Development Flow
+
+1. **Morning**: Plan features, write component outlines
+2. **Use Copilot**: Generate boilerplate, API calls, utilities
+3. **Use Cursor**: Complex logic, refactoring, debugging
+4. **Test**: Run on simulator/device
+5. **Commit**: Push working code to GitHub
+
+### Testing on Device
+
+```bash
+# Start development server
+npx expo start
+
+# Options will appear:
+# - Press 'i' for iOS simulator
+# - Press 'a' for Android emulator
+# - Scan QR code with Expo Go app for physical device
+```
+
+## Step 10: GitHub Repository Setup
+
+```bash
+# Initialize git (if not already done)
+git init
+
+# Add all files
+git add .
+
+# Initial commit
+git commit -m "Initial commit: Balling Out Loud setup"
+
+# Create GitHub repo and push
+git remote add origin https://github.com/BallingOutLoud/stattrack.git
+git branch -M main
+git push -u origin main
+```
+
+## Development Phases Checklist
+
+### Phase 1: Foundation (Week 1)
+- [ ] Complete project setup
+- [ ] Configure Supabase
+- [ ] Create database schema
+- [ ] Set up authentication flow
+- [ ] Basic navigation structure
+- [ ] Theme configuration
+
+### Phase 2: Core UI (Week 2)
+- [ ] Game Stream screen
+- [ ] Game detail screen
+- [ ] Team management screens
+- [ ] Player management screens
+- [ ] Profile screen
+
+### Phase 3: Stat Tracking (Week 3-4)
+- [ ] Live stat tracking interface
+- [ ] Stat button interactions
+- [ ] Score updates
+- [ ] Quarter management
+- [ ] Undo functionality
+
+### Phase 4: Data & Real-time (Week 5)
+- [ ] Connect all API endpoints
+- [ ] Implement real-time updates
+- [ ] Add offline support
+- [ ] Data persistence
+- [ ] Error handling
+
+### Phase 5: Polish (Week 6)
+- [ ] UI refinements
+- [ ] Performance optimization
+- [ ] Add animations
+- [ ] User feedback
+- [ ] Bug fixes
+
+## Common Issues & Solutions
+
+### Issue: Expo won't start
+```bash
+# Clear cache and restart
+npx expo start --clear
+```
+
+### Issue: Supabase connection errors
+- Check `.env` file has correct values
+- Verify Supabase project is running
+- Check network connection
+
+### Issue: TypeScript errors
+```bash
+# Regenerate TypeScript declarations
+npx expo customize tsconfig.json
+```
+
+### Issue: iOS build errors
+```bash
+# Clean and reinstall pods (Mac only)
+cd ios
+pod deintegrate
+pod install
+cd ..
+```
+
+## Useful Commands
+
+```bash
+# Start development server
+npx expo start
+
+# Run on iOS
+npx expo run:ios
+
+# Run on Android
+npx expo run:android
+
+# Run tests
+npm test
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+
+# Build for production
+eas build --platform ios
+eas build --platform android
+```
+
+## Resources
+
+- **Expo Docs**: https://docs.expo.dev
+- **React Navigation**: https://reactnavigation.org
+- **Supabase Docs**: https://supabase.com/docs
+- **GitHub Copilot Tips**: https://github.com/features/copilot
+- **Cursor AI Docs**: https://cursor.sh/docs
+
+## Next Steps
+
+1. Copy the provided component files into your project
+2. Start with authentication flow
+3. Build out the game stream feed
+4. Implement stat tracking
+5. Test thoroughly on real devices
+
+## Support & Community
+
+- GitHub Issues: Report bugs and request features
+- Discord: Join our community (link TBD)
+- Email: support@ballingoutloud.com
 
 ---
 
-**Note**: This project is actively under development. Features and documentation are subject to change. Star the repo to stay updated on progress!
+**Remember**: Take it one feature at a time. Use Copilot for speed, Cursor for complexity, and always test on real devices frequently!
