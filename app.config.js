@@ -9,30 +9,41 @@ export default {
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
-      backgroundColor: "#ffffff"
+      backgroundColor: "#1a1a2e",
     },
-    assetBundlePatterns: [
-      "**/*"
-    ],
+    assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.ballingoutloud.app"
+      bundleIdentifier: "com.ballingoutloud.app",
+      buildNumber: "1",
+      infoPlist: {
+        NSCameraUsageDescription:
+          "This app uses the camera to capture team photos and player avatars.",
+        NSPhotoLibraryUsageDescription:
+          "This app accesses your photo library to select team logos and player images.",
+        ITSAppUsesNonExemptEncryption: false,
+      },
     },
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#ffffff"
+        backgroundColor: "#1a1a2e",
       },
-      package: "com.ballingoutloud.app"
+      package: "com.ballingoutloud.app",
+      versionCode: 1,
     },
     web: {
-      favicon: "./assets/favicon.png"
+      favicon: "./assets/favicon.png",
     },
     extra: {
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
       supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+      eas: {
+        projectId: "b9050a25-a3c9-460c-afaf-87371f85a789",
+      },
     },
+    owner: "as12711",
     plugins: [],
-    scheme: "ballingoutloud"
-  }
+    scheme: "ballingoutloud",
+  },
 };

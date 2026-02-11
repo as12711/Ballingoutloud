@@ -9,7 +9,12 @@
     "web": "expo start --web",
     "lint": "eslint . --ext .ts,.tsx",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "build:dev": "eas build --profile development --platform ios",
+    "build:preview": "eas build --profile preview --platform ios",
+    "build:production": "eas build --profile production --platform ios",
+    "submit:ios": "eas submit --platform ios --latest",
+    "deploy:testflight": "eas build --profile production --platform ios --auto-submit"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.1.3",
