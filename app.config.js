@@ -43,7 +43,7 @@ export default {
       },
     },
     owner: "as12711",
-    plugins: [],
+    plugins: ["./plugins/withRemovePushEntitlement"],
     scheme: "ballingoutloud",
   },
 };
