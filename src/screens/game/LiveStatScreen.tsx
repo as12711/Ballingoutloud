@@ -45,7 +45,7 @@ const LiveStatScreen: React.FC = () => {
       selectedPlayer,
       selectedTeam,
       eventType as any,
-      currentGame.current_quarter,
+      currentGame.currentQuarter,
       'current-user-id' // Replace with actual user ID
     );
   };
@@ -55,7 +55,7 @@ const LiveStatScreen: React.FC = () => {
       <ScoreBoard game={currentGame} />
 
       <View style={styles.quarterSection}>
-        <Text style={styles.sectionTitle}>Current Quarter: {formatQuarter(currentGame.current_quarter)}</Text>
+        <Text style={styles.sectionTitle}>Current Quarter: {formatQuarter(currentGame.currentQuarter)}</Text>
       </View>
 
       <View style={styles.statsSection}>

@@ -43,7 +43,7 @@ const GameDetailScreen: React.FC = () => {
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Date & Time:</Text>
-          <Text style={styles.detailValue}>{formatDateTime(currentGame.scheduled_at)}</Text>
+          <Text style={styles.detailValue}>{formatDateTime(currentGame.scheduledAt)}</Text>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Status:</Text>

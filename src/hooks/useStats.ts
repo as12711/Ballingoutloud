@@ -29,13 +29,13 @@ export const useStats = () => {
   ) => {
     return dispatch(
       createStatEvent({
-        game_id: gameId,
-        player_id: playerId,
-        team_id: teamId,
-        event_type: eventType,
+        gameId,
+        playerId,
+        teamId,
+        eventType,
         quarter,
         timestamp: new Date().toISOString(),
-        created_by: createdBy,
+        createdBy,
       })
     );
   };

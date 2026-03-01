@@ -31,7 +31,7 @@ export const statsApi = {
     return data;
   },
 
-  createStatEvent: async (event: Omit<StatEvent, 'id' | 'created_at'>): Promise<StatEvent> => {
+  createStatEvent: async (event: Omit<StatEvent, 'id' | 'createdAt'>): Promise<StatEvent> => {
     const { data, error } = await supabase
       .from('stat_events')
       .insert(event)

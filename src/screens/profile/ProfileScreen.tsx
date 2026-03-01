@@ -206,7 +206,7 @@ const ProfileScreen: React.FC = () => {
         <Animated.View style={[styles.avatarContainer, { transform: [{ scale: avatarScale }] }]}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {user?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+              {user?.fullName?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || '?'}
             </Text>
           </View>
           <View style={[styles.roleBadge, { backgroundColor: getRoleBadgeColor(user?.role) }]}>
@@ -215,7 +215,7 @@ const ProfileScreen: React.FC = () => {
         </Animated.View>
 
         {/* User Info */}
-        <Text style={styles.userName}>{user?.full_name || 'User'}</Text>
+        <Text style={styles.userName}>{user?.fullName || 'User'}</Text>
         <Text style={styles.userEmail}>{user?.email}</Text>
 
         {/* Role Badge */}

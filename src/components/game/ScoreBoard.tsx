@@ -14,21 +14,21 @@ const ScoreBoard: React.FC<ScoreBoardProps> = ({ game, onQuarterPress }) => {
     <View style={styles.container}>
       <View style={styles.teamsRow}>
         <View style={styles.teamColumn}>
-          <Text style={styles.teamName}>{game.home_team.name}</Text>
-          <Text style={styles.score}>{game.home_score}</Text>
+          <Text style={styles.teamName}>{game.homeTeam.name}</Text>
+          <Text style={styles.score}>{game.homeScore}</Text>
         </View>
         <View style={styles.vsColumn}>
           <Text style={styles.vs}>VS</Text>
         </View>
         <View style={styles.teamColumn}>
-          <Text style={styles.teamName}>{game.away_team.name}</Text>
-          <Text style={styles.score}>{game.away_score}</Text>
+          <Text style={styles.teamName}>{game.awayTeam.name}</Text>
+          <Text style={styles.score}>{game.awayScore}</Text>
         </View>
       </View>
 
       <View style={styles.quarterRow}>
         <Text style={styles.quarterLabel}>Quarter:</Text>
-        <Text style={styles.quarter}>{formatQuarter(game.current_quarter)}</Text>
+        <Text style={styles.quarter}>{formatQuarter(game.currentQuarter)}</Text>
       </View>
     </View>
   );

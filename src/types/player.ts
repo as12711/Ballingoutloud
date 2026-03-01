@@ -31,3 +31,22 @@ export interface PlayerSeasonStats {
   threePointPercentage: number;
   ftPercentage: number;
 }
+
+export interface CreatePlayerInput {
+  team_id: string;
+  first_name: string;
+  last_name: string;
+  jersey_number: number;
+  position: string;
+  grade?: number;
+  height?: string;
+}
+
+export interface UpdatePlayerInput {
+  first_name?: string;
+  last_name?: string;
+  jersey_number?: number;
+  position?: string;
+  grade?: number;
+  height?: string;
+}

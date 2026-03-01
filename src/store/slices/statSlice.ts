@@ -30,7 +30,7 @@ export const fetchGameStats = createAsyncThunk(
 
 export const createStatEvent = createAsyncThunk(
   'stat/createStatEvent',
-  async (event: Omit<StatEvent, 'id' | 'created_at'>) => {
+  async (event: Omit<StatEvent, 'id' | 'createdAt'>) => {
     const createdEvent = await statsApi.createStatEvent(event);
     return createdEvent;
   }
@@ -100,7 +100,7 @@ const statSlice = createSlice({
       })
       .addCase(updatePlayerStats.fulfilled, (state, action) => {
         const index = state.gameStats.findIndex(
-          (stat) => stat.player_id === action.payload.player_id
+          (stat) => stat.playerId === action.payload.playerId
         );
         if (index >= 0) {
           state.gameStats[index] = action.payload;

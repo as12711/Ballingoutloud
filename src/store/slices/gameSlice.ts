@@ -54,13 +54,13 @@ const gameSlice = createSlice({
       action: PayloadAction<{ homeScore: number; awayScore: number }>
     ) => {
       if (state.currentGame) {
-        state.currentGame.home_score = action.payload.homeScore;
-        state.currentGame.away_score = action.payload.awayScore;
+        state.currentGame.homeScore = action.payload.homeScore;
+        state.currentGame.awayScore = action.payload.awayScore;
       }
     },
     updateGameQuarter: (state, action: PayloadAction<number>) => {
       if (state.currentGame) {
-        state.currentGame.current_quarter = action.payload;
+        state.currentGame.currentQuarter = action.payload;
       }
     },
     clearError: (state) => {

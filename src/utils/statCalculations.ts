@@ -1,25 +1,25 @@
 import { GameStats } from '../types/stat';
 
 export const calculateFGPercentage = (stats: GameStats): number => {
-  if (stats.fg_attempts === 0) return 0;
-  return (stats.fg_made / stats.fg_attempts) * 100;
+  if (stats.fgAttempts === 0) return 0;
+  return (stats.fgMade / stats.fgAttempts) * 100;
 };
 
 export const calculate3PTPercentage = (stats: GameStats): number => {
-  if (stats.three_pt_attempts === 0) return 0;
-  return (stats.three_pt_made / stats.three_pt_attempts) * 100;
+  if (stats.threePtAttempts === 0) return 0;
+  return (stats.threePtMade / stats.threePtAttempts) * 100;
 };
 
 export const calculateFTPercentage = (stats: GameStats): number => {
-  if (stats.free_throw_attempts === 0) return 0;
-  return (stats.free_throw_made / stats.free_throw_attempts) * 100;
+  if (stats.freeThrowAttempts === 0) return 0;
+  return (stats.freeThrowMade / stats.freeThrowAttempts) * 100;
 };
 
 export const calculateTotalPoints = (stats: GameStats): number => {
   return (
-    stats.fg_made * 2 +
-    stats.three_pt_made * 3 +
-    stats.free_throw_made
+    stats.fgMade * 2 +
+    stats.threePtMade * 3 +
+    stats.freeThrowMade
   );
 };
 

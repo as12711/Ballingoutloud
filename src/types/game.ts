@@ -53,3 +53,19 @@ export interface LiveGameState {
   awayFouls: number;
   quarterScores: QuarterScore[];
 }
+
+export interface CreateGameInput {
+  home_team_id: string;
+  away_team_id: string;
+  scheduled_at: string;
+  venue: string;
+  league?: string;
+  status?: GameStatus;
+}
+
+export interface UpdateGameInput {
+  home_score?: number;
+  away_score?: number;
+  current_quarter?: number;
+  status?: GameStatus;
+}

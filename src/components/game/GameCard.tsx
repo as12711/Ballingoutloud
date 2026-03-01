@@ -30,27 +30,27 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
       <View style={styles.teamsContainer}>
         <View style={styles.team}>
-          {game.home_team.logo_url && (
-            <Image source={{ uri: game.home_team.logo_url }} style={styles.logo} />
+          {game.homeTeam.logoUrl && (
+            <Image source={{ uri: game.homeTeam.logoUrl }} style={styles.logo} />
           )}
-          <Text style={styles.teamName}>{game.home_team.name}</Text>
+          <Text style={styles.teamName}>{game.homeTeam.name}</Text>
         </View>
 
         <View style={styles.scoreContainer}>
-          <Text style={styles.score}>{formatScore(game.home_score, game.away_score)}</Text>
+          <Text style={styles.score}>{formatScore(game.homeScore, game.awayScore)}</Text>
         </View>
 
         <View style={styles.team}>
-          {game.away_team.logo_url && (
-            <Image source={{ uri: game.away_team.logo_url }} style={styles.logo} />
+          {game.awayTeam.logoUrl && (
+            <Image source={{ uri: game.awayTeam.logoUrl }} style={styles.logo} />
           )}
-          <Text style={styles.teamName}>{game.away_team.name}</Text>
+          <Text style={styles.teamName}>{game.awayTeam.name}</Text>
         </View>
       </View>
 
       <View style={styles.footer}>
         <Text style={styles.venue}>{game.venue}</Text>
-        <Text style={styles.date}>{formatDateTime(game.scheduled_at)}</Text>
+        <Text style={styles.date}>{formatDateTime(game.scheduledAt)}</Text>
       </View>
     </Card>
   );

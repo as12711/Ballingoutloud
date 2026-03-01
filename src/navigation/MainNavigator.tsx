@@ -32,27 +32,28 @@ export type MainStackParamList = {
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 const MainNavigator: React.FC = () => {
-  // For web preview: Set GameSummary as initial route
-  // For production/mobile, start with GameStream
-  // To preview with real data, replace testGameId with an actual gameId from your Supabase database
-  const initialRouteName = Platform.OS === 'web' && __DEV__ 
-    ? 'GameSummary' 
-    : 'GameStream';
-
-  // Test gameId for preview - IMPORTANT: Replace with actual gameId from your Supabase database
-  // You can find game IDs in your Supabase dashboard → Table Editor → games table
-  const testGameId = process.env.EXPO_PUBLIC_TEST_GAME_ID || 'test-game-id-123';
+  // Always start on GameStream (the main feed).
+  // To preview GameSummary on web, set EXPO_PUBLIC_TEST_GAME_ID to a valid game UUID
+  // and change initialRouteName to 'GameSummary' here.
+  const testGameId = process.env.EXPO_PUBLIC_TEST_GAME_ID;
+  const initialRouteName: keyof MainStackParamList =
+    Platform.OS === 'web' && __DEV__ && testGameId
+      ? 'GameSummary'
+      : 'GameStream';
 
   return (
     <Stack.Navigator
       initialRouteName={initialRouteName}
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#FF6B35',
+          backgroundColor: '#0A1929',
         },
         headerTintColor: '#FFFFFF',
         headerTitleStyle: {
           fontWeight: 'bold',
+        },
+        contentStyle: {
+          backgroundColor: '#0A1929',
         },
       }}
     >

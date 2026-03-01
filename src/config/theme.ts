@@ -15,6 +15,7 @@ export const lightTheme = {
     onSurface: '#000000',
     onError: '#ffffff',
     text: '#000000',
+    textSecondary: '#666666',
   },
 };
 
@@ -33,6 +34,7 @@ export const darkTheme = {
     onSurface: '#ffffff',
     onError: '#000000',
     text: '#ffffff',
+    textSecondary: '#999999',
   },
 };
 

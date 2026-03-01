@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   expo: {
     name: "Balling Out Loud",
     slug: "balling-out-loud",
@@ -11,7 +11,6 @@ export default {
       resizeMode: "contain",
       backgroundColor: "#1a1a2e",
     },
-    assetBundlePatterns: ["**/*"],
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.ballingoutloud.app",
@@ -45,5 +44,6 @@ export default {
     owner: "as12711",
     plugins: ["./plugins/withRemovePushEntitlement"],
     scheme: "ballingoutloud",
+    newArchEnabled: true,
   },
 };

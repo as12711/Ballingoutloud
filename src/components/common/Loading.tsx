@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { theme } from '../../config/theme';
 
 interface LoadingProps {
   size?: 'small' | 'large';
@@ -10,7 +9,7 @@ interface LoadingProps {
 
 const Loading: React.FC<LoadingProps> = ({
   size = 'large',
-  color = theme.colors.primary,
+  color = '#FF6B35',
   fullScreen = false,
 }) => {
   return (
@@ -30,7 +29,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.colors.background,
+    backgroundColor: '#0A1929',
   },
 });
 
