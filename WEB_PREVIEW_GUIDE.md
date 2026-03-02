@@ -1,123 +1,81 @@
-# Web Preview Guide - Game Summary Screen
+# Web Preview Guide
 
-## Quick Start
+## Interactive Stat Tracker (Recommended)
 
-To preview the Game Summary Screen in your browser:
+The standalone HTML stat tracker at `web/index.html` provides full functionality in any browser — no Expo or Metro bundler needed.
 
-### 1. Install Dependencies (Already Done ✅)
+### Quick Start
+
 ```bash
-npm install react-native-web @expo/metro-runtime react-dom --legacy-peer-deps
+# Option 1: Open directly in browser
+open web/index.html        # macOS
+xdg-open web/index.html    # Linux
+start web/index.html        # Windows
+
+# Option 2: Serve with any static server
+npx serve web
 ```
 
-### 2. Set Up Environment Variables (Optional)
-Create a `.env` file in the root directory:
-```env
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
-EXPO_PUBLIC_TEST_GAME_ID=your_actual_game_id_here
-```
+### Features
 
-**Note**: For preview with real data, you'll need:
-- A Supabase database with game data
-- A valid `gameId` from your `games` table
-- Player stats data in the `game_stats` table
+The web stat tracker connects directly to Supabase and provides:
 
-### 3. Start Web Server
+- **Games tab** — View all games, create new games, click live games to track stats
+- **Teams tab** — View/create teams
+- **Players tab** — View/add players to teams
+- **Live Tracker** — Full stat tracking with:
+  - Player selector (both teams' rosters)
+  - Shooting buttons (2PT FGA/FGM, 3PT FGA/FGM, FT ATT/MADE)
+  - Action buttons (REB, AST, STL, BLK, TO, FOUL)
+  - Auto score calculation from made shots
+  - Quarter management
+  - Undo last action (reverses stat event, game_stats, and score)
+  - Live event log
+  - Box score view
+  - End game (marks as completed)
+- **Box Score modal** — Full player-by-player stats table for any game
+
+All data persists to Supabase and will appear in the Expo mobile app.
+
+---
+
+## Expo Web Preview (via Metro)
+
+The Expo app can also run in a browser via Metro bundler.
+
+### Start Web Server
+
 ```bash
 npm run web
 ```
 
-This will:
-- Start the Expo development server
-- Automatically open your browser at `http://localhost:8081`
-- Show the Game Summary Screen (set as initial route for web preview)
+Opens at `http://localhost:8081`.
 
-### 4. Preview the UI
+### Initial Route Behavior
 
-The screen will load with:
-- **Loading State**: Shows a spinner while fetching data
-- **Error State**: If gameId is invalid or data doesn't exist, shows error with retry button
-- **Success State**: Shows complete box score with:
-  - Team headers with names and scores
-  - Team totals (points, rebounds, assists, fouls)
-  - Individual player statistics
+- **Default**: Opens to `GameStream` screen (game list)
+- **GameSummary preview**: Set `EXPO_PUBLIC_TEST_GAME_ID` in `.env` to a valid game UUID, and the web dev build will open directly to the Box Score screen for that game
 
-## Using a Real Game ID
+### Environment Variables
 
-### Option 1: Environment Variable (Recommended)
-1. Get a game ID from your Supabase dashboard:
-   - Go to Table Editor → `games` table
-   - Copy a game `id` (UUID format)
-2. Add to `.env` file:
-   ```env
-   EXPO_PUBLIC_TEST_GAME_ID=your-actual-game-uuid-here
-   ```
-3. Restart the web server
-
-### Option 2: Update Code Directly
-1. Open `src/navigation/MainNavigator.tsx`
-2. Find the `testGameId` constant (around line 35)
-3. Replace `'test-game-id-123'` with your actual game ID
-4. Restart the web server
-
-## Troubleshooting
-
-### "Failed to load game summary" Error
-- **Cause**: Invalid gameId or no data in database
-- **Solution**: 
-  1. Verify gameId exists in your `games` table
-  2. Check that `game_stats` table has data for that game
-  3. Ensure Supabase environment variables are set correctly
-
-### Blank Screen / Loading Forever
-- **Cause**: Supabase connection issue or missing environment variables
-- **Solution**:
-  1. Check `.env` file has correct Supabase credentials
-  2. Verify Supabase project is running
-  3. Check browser console for errors (F12 → Console)
-
-### Components Not Rendering
-- **Cause**: Missing data or transformation errors
-- **Solution**:
-  1. Check browser console for errors
-  2. Verify database schema matches expected structure
-  3. Ensure `game_stats` has required fields (points, rebounds, assists, fouls)
-
-## Preview Features
-
-The web preview includes:
-- ✅ Full UI rendering (dark theme)
-- ✅ Loading states
-- ✅ Error handling with retry
-- ✅ Refresh functionality
-- ✅ Responsive layout
-- ⚠️ Some native features may be limited (e.g., SafeAreaView on web)
-
-## Development Tips
-
-1. **Browser DevTools**: Use F12 to inspect elements and see console logs
-2. **Hot Reload**: Changes to components will auto-refresh
-3. **Network Tab**: Check API calls to Supabase in Network tab
-4. **React DevTools**: Install React DevTools extension for component inspection
-
-## Navigation
-
-From the Game Summary Screen:
-- **Back Button**: Returns to previous screen (or home if initial route)
-- **Refresh Button**: Reloads game data from Supabase
-
-To navigate from code:
-```tsx
-navigation.navigate('GameSummary', { gameId: 'your-game-id' });
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://alniygpluvshxzjoojao.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+EXPO_PUBLIC_TEST_GAME_ID=          # Optional: UUID from games table
 ```
 
-## Production Notes
+### Troubleshooting
 
-When deploying:
-- Remove the `initialRouteName` logic that defaults to GameSummary for web
-- Ensure proper authentication/navigation flow
-- GameSummary should be accessed via navigation from other screens
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| Blank white screen | No games in database | Use `web/index.html` to create teams, players, and games first |
+| "No games found" on GameStream | Database is empty or filter returns nothing | Create games via the web tracker or Supabase dashboard |
+| GameSummary shows error | `EXPO_PUBLIC_TEST_GAME_ID` is invalid or unset | Set it to a real game UUID that has `game_stats` data |
+| Metro won't start | Port 8081 in use | `fuser -k 8081/tcp` or use `--port 8082` |
 
----
+### Limitations on Web
 
-**Ready to Preview?** Run `npm run web` and open http://localhost:8081 in your browser! 🚀
+- `SafeAreaView` renders as a plain `View`
+- Native animations may be simplified
+- Push notifications not available
+- Some gesture handlers may not work

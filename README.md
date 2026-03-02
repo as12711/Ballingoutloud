@@ -254,41 +254,51 @@ git push -u origin main
 
 ## Development Phases Checklist
 
-### Phase 1: Foundation (Week 1)
-- [ ] Complete project setup
-- [ ] Configure Supabase
-- [ ] Create database schema
-- [ ] Set up authentication flow
-- [ ] Basic navigation structure
-- [ ] Theme configuration
+### Phase 1: Foundation
+- [x] Complete project setup (Expo SDK 54, TypeScript, ESLint, Prettier)
+- [x] Configure Supabase (client in `src/config/supabase.ts`, env vars)
+- [x] Create database schema (7 tables with RLS, triggers, indexes)
+- [x] Set up authentication flow (Login, SignUp, Onboarding screens + authSlice)
+- [x] Basic navigation structure (Stack navigator with 12 screens)
+- [x] Theme configuration (Court Vision dark theme + light/dark Paper themes)
 
-### Phase 2: Core UI (Week 2)
-- [ ] Game Stream screen
-- [ ] Game detail screen
-- [ ] Team management screens
-- [ ] Player management screens
-- [ ] Profile screen
+### Phase 2: Core UI
+- [x] Game Stream screen (live Supabase query, filter tabs, search, pull-to-refresh)
+- [x] Game Detail screen (real data, scoreboard, navigate to live stats/box score)
+- [x] Game Summary / Box Score screen (multi-table aggregation, team sections, player rows)
+- [x] Team List screen (real Supabase fetch, search, animated cards)
+- [ ] Team Detail screen (stub — "Coming Soon")
+- [ ] Create Team screen (stub — "Coming Soon")
+- [x] Player List screen (real Supabase fetch, position filter, search)
+- [x] Player Detail screen (real player data, hero section, stats display)
+- [ ] Create Player screen (stub — "Coming Soon")
+- [x] Profile screen (real user data, role badge, sign out)
+- [x] Settings screen (full UI, toggles — no persistence yet)
+- [x] Interactive web stat tracker (`web/index.html` — full CRUD + live tracking)
 
-### Phase 3: Stat Tracking (Week 3-4)
-- [ ] Live stat tracking interface
-- [ ] Stat button interactions
-- [ ] Score updates
-- [ ] Quarter management
-- [ ] Undo functionality
+### Phase 3: Stat Tracking
+- [x] Live stat tracking interface (stat buttons for all event types)
+- [x] Stat button interactions (records to `stat_events` + updates `game_stats`)
+- [x] Score updates (auto-calculates from made shots, syncs to `games` table)
+- [x] Quarter management (increment/decrement, persisted to DB)
+- [x] Undo functionality (reverses last stat event + game_stats + score)
+- [ ] Player selection modal in mobile app (LiveStatScreen has no selector — web tracker does)
+- [ ] Free throw buttons in mobile LiveStatScreen (schema supports it, buttons missing)
 
-### Phase 4: Data & Real-time (Week 5)
-- [ ] Connect all API endpoints
-- [ ] Implement real-time updates
+### Phase 4: Data & Real-time
+- [x] Connect all API endpoints (auth, games, teams, players, stats — all wired to Supabase)
+- [x] `useRealtime` hook coded (subscribes to `games` UPDATE + `stat_events` INSERT)
+- [ ] Wire `useRealtime` into screens (hook exists but NO screen imports it)
 - [ ] Add offline support
-- [ ] Data persistence
-- [ ] Error handling
+- [ ] Auth state listener (`onAuthStateChange` not implemented)
+- [x] Error handling (try/catch in all async thunks, error states in screens)
 
-### Phase 5: Polish (Week 6)
-- [ ] UI refinements
-- [ ] Performance optimization
-- [ ] Add animations
-- [ ] User feedback
-- [ ] Bug fixes
+### Phase 5: Polish
+- [x] UI refinements (Court Vision dark theme across all screens)
+- [ ] Performance optimization (React.memo, FlatList virtualization)
+- [x] Add animations (ProfileScreen, OnboardingScreen, TeamListScreen, PlayerListScreen)
+- [ ] User feedback (haptic feedback, sound effects)
+- [ ] Bug fixes: SignUp role not sent to API, fake stats on Team/Player lists, `types/index.ts` legacy conflicts
 
 ## Common Issues & Solutions
 

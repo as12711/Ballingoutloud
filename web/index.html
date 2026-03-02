@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balling Out Loud — Stat Tracker</title>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    --deep-navy: #0A1929;
+    --mid-navy: #0D2137;
+    --card-bg: #111B27;
+    --court-orange: #FF6B35;
+    --court-orange-light: #FF8A5B;
+    --white: #FFFFFF;
+    --text-muted: #6B7280;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
+    --court-line: rgba(255, 107, 53, 0.08);
+    --card-border: rgba(255, 255, 255, 0.06);
+    --purple: #8B5CF6;
+    --blue: #3B82F6;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--deep-navy);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* Background court lines */
+  body::before, body::after {
+    content: '';
+    position: fixed;
+    height: 1px;
+    width: 300%;
+    background: var(--court-line);
+    transform: rotate(-20deg);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::before { top: 25%; left: -50%; }
+  body::after { top: 65%; left: -30%; opacity: 0.5; }
+
+  /* Nav */
+  .nav {
+    background: var(--mid-navy);
+    border-bottom: 1px solid var(--card-border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav-brand span { font-size: 28px; }
+  .nav-brand h1 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, var(--court-orange), var(--court-orange-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .nav-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--error);
+    transition: background 0.3s;
+  }
+  .status-dot.connected { background: var(--success); }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    padding: 16px 24px 0;
+    position: relative;
+    z-index: 1;
+  }
+  .tab {
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab:hover { border-color: var(--court-orange); color: var(--white); }
+  .tab.active {
+    background: var(--court-orange);
+    border-color: var(--court-orange);
+    color: var(--white);
+  }
+
+  /* Main content */
+  .content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--court-orange);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .section-count {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .card:hover {
+    border-color: rgba(255, 107, 53, 0.3);
+    transform: translateY(-1px);
+  }
+
+  /* Game Card */
+  .game-card { position: relative; overflow: hidden; }
+  .game-card .status-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .status-live { background: rgba(239,68,68,0.15); color: var(--error); }
+  .status-scheduled { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .status-completed { background: rgba(16,185,129,0.15); color: var(--success); }
+  .game-teams {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin: 8px 0 16px;
+  }
+  .game-team {
+    text-align: center;
+    flex: 1;
+  }
+  .game-team-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .game-score {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--court-orange);
+  }
+  .game-vs {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .game-meta {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--card-border);
+    padding-top: 12px;
+  }
+
+  /* Team Card */
+  .team-card { display: flex; align-items: center; gap: 16px; }
+  .team-logo {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: rgba(255,107,53,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--court-orange);
+    flex-shrink: 0;
+  }
+  .team-info { flex: 1; }
+  .team-name { font-size: 15px; font-weight: 700; color: var(--white); }
+  .team-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Player Card */
+  .player-card { display: flex; align-items: center; gap: 16px; }
+  .player-jersey {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    background: rgba(255,107,53,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .player-jersey-num {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--court-orange);
+  }
+  .player-name { font-size: 15px; font-weight: 700; color: var(--white); }
+  .player-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .player-stats {
+    display: flex;
+    gap: 16px;
+    margin-left: auto;
+  }
+  .stat-cell { text-align: center; }
+  .stat-value { font-size: 16px; font-weight: 700; color: var(--white); }
+  .stat-label { font-size: 10px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
+
+  /* Box Score Table */
+  .box-score { overflow-x: auto; }
+  .box-score table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .box-score th {
+    text-align: center;
+    padding: 8px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--court-orange);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .box-score th:first-child { text-align: left; }
+  .box-score td {
+    text-align: center;
+    padding: 10px 6px;
+    border-bottom: 1px solid var(--card-border);
+    color: var(--white);
+  }
+  .box-score td:first-child { text-align: left; color: var(--white); font-weight: 600; }
+  .box-score tr:last-child td { border-bottom: none; }
+  .box-score .totals-row td {
+    font-weight: 700;
+    color: var(--court-orange);
+    border-top: 2px solid var(--court-orange);
+    border-bottom: none;
+  }
+
+  /* Live Stat Tracker */
+  .live-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .live-scoreboard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .live-team { text-align: center; flex: 1; }
+  .live-team-name { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+  .live-team-score {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--court-orange);
+    line-height: 1;
+  }
+  .live-quarter {
+    background: rgba(255,107,53,0.15);
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--court-orange);
+  }
+  .player-selector {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .player-chip {
+    padding: 8px 16px;
+    border-radius: 12px;
+    background: var(--mid-navy);
+    border: 1px solid var(--card-border);
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .player-chip:hover { border-color: var(--court-orange); color: var(--white); }
+  .player-chip.active {
+    background: var(--court-orange);
+    border-color: var(--court-orange);
+    color: var(--white);
+  }
+  .stat-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .stat-btn {
+    padding: 14px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: var(--mid-navy);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .stat-btn:hover { background: rgba(255,107,53,0.15); border-color: var(--court-orange); }
+  .stat-btn:active { transform: scale(0.95); }
+  .stat-btn.danger { border-color: rgba(239,68,68,0.3); }
+  .stat-btn.danger:hover { background: rgba(239,68,68,0.15); }
+  .stat-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .event-log {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .event-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--card-border);
+    font-size: 12px;
+  }
+  .event-item:last-child { border-bottom: none; }
+  .event-type { color: var(--court-orange); font-weight: 600; }
+  .event-player { color: var(--white); }
+  .event-time { color: var(--text-muted); }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .empty-icon { font-size: 64px; margin-bottom: 16px; }
+  .empty-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .empty-subtitle { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+
+  /* Buttons */
+  .btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--court-orange); color: var(--white); }
+  .btn-primary:hover { background: var(--court-orange-light); }
+  .btn-outline {
+    background: transparent;
+    color: var(--court-orange);
+    border: 1px solid var(--court-orange);
+  }
+  .btn-outline:hover { background: rgba(255,107,53,0.1); }
+  .btn-sm { padding: 8px 16px; font-size: 12px; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--mid-navy);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 28px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--court-orange);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .form-input, .form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--white);
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--court-orange); }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
+  .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+
+  /* Grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } .stat-buttons { grid-template-columns: repeat(2, 1fr); } }
+
+  /* Loading */
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--card-border);
+    border-top-color: var(--court-orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 40px auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 300;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: var(--success); color: var(--white); }
+  .toast.error { background: var(--error); color: var(--white); }
+
+  /* Hide sections */
+  .view { display: none; }
+  .view.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-brand">
+    <span>🏀</span>
+    <h1>BALLING OUT LOUD</h1>
+  </div>
+  <div class="nav-status">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Connecting...</span>
+  </div>
+</nav>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" data-view="games">Games</div>
+  <div class="tab" data-view="teams">Teams</div>
+  <div class="tab" data-view="players">Players</div>
+  <div class="tab" data-view="live">Live Tracker</div>
+</div>
+
+<!-- Games View -->
+<div class="content">
+  <div class="view active" id="view-games">
+    <div class="section-header">
+      <span class="section-title">GAMES</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="section-count" id="gameCount"></span>
+        <button class="btn btn-primary btn-sm" onclick="openModal('game')">+ New Game</button>
+      </div>
+    </div>
+    <div id="gamesList"></div>
+  </div>
+
+  <!-- Teams View -->
+  <div class="view" id="view-teams">
+    <div class="section-header">
+      <span class="section-title">TEAMS</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="section-count" id="teamCount"></span>
+        <button class="btn btn-primary btn-sm" onclick="openModal('team')">+ New Team</button>
+      </div>
+    </div>
+    <div id="teamsList"></div>
+  </div>
+
+  <!-- Players View -->
+  <div class="view" id="view-players">
+    <div class="section-header">
+      <span class="section-title">PLAYERS</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="section-count" id="playerCount"></span>
+        <button class="btn btn-primary btn-sm" onclick="openModal('player')">+ New Player</button>
+      </div>
+    </div>
+    <div id="playersList"></div>
+  </div>
+
+  <!-- Live Tracker View -->
+  <div class="view" id="view-live">
+    <div class="section-header">
+      <span class="section-title">LIVE STAT TRACKER</span>
+    </div>
+    <div id="liveContent">
+      <div class="empty-state">
+        <div class="empty-icon">📊</div>
+        <div class="empty-title">Select a Live Game</div>
+        <div class="empty-subtitle">Go to Games tab and click a live game to start tracking stats.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Game Modal -->
+<div class="modal-overlay" id="modal-game">
+  <div class="modal">
+    <h2>Create Game</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">HOME TEAM</label>
+        <select class="form-select" id="gameHomeTeam"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">AWAY TEAM</label>
+        <select class="form-select" id="gameAwayTeam"></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">VENUE</label>
+      <input class="form-input" id="gameVenue" placeholder="e.g. Main Gym">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">LEAGUE</label>
+        <input class="form-input" id="gameLeague" placeholder="e.g. Varsity">
+      </div>
+      <div class="form-group">
+        <label class="form-label">DATE & TIME</label>
+        <input class="form-input" id="gameDate" type="datetime-local">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">STATUS</label>
+      <select class="form-select" id="gameStatus">
+        <option value="scheduled">Scheduled</option>
+        <option value="live">Live</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('game')">Cancel</button>
+      <button class="btn btn-primary" onclick="createGame()">Create Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- Team Modal -->
+<div class="modal-overlay" id="modal-team">
+  <div class="modal">
+    <h2>Create Team</h2>
+    <div class="form-group">
+      <label class="form-label">TEAM NAME</label>
+      <input class="form-input" id="teamName" placeholder="e.g. Eagles">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">SCHOOL</label>
+        <input class="form-input" id="teamSchool" placeholder="e.g. Lincoln High">
+      </div>
+      <div class="form-group">
+        <label class="form-label">LEAGUE</label>
+        <input class="form-input" id="teamLeague" placeholder="e.g. Varsity">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('team')">Cancel</button>
+      <button class="btn btn-primary" onclick="createTeam()">Create Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- Player Modal -->
+<div class="modal-overlay" id="modal-player">
+  <div class="modal">
+    <h2>Add Player</h2>
+    <div class="form-group">
+      <label class="form-label">TEAM</label>
+      <select class="form-select" id="playerTeam"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">FIRST NAME</label>
+        <input class="form-input" id="playerFirst" placeholder="First">
+      </div>
+      <div class="form-group">
+        <label class="form-label">LAST NAME</label>
+        <input class="form-input" id="playerLast" placeholder="Last">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">JERSEY #</label>
+        <input class="form-input" id="playerJersey" type="number" min="0" max="99" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">POSITION</label>
+        <select class="form-select" id="playerPosition">
+          <option value="PG">PG</option>
+          <option value="SG">SG</option>
+          <option value="SF">SF</option>
+          <option value="PF">PF</option>
+          <option value="C">C</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">GRADE</label>
+        <select class="form-select" id="playerGrade">
+          <option value="">—</option>
+          <option value="9">9th</option>
+          <option value="10">10th</option>
+          <option value="11">11th</option>
+          <option value="12">12th</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">HEIGHT</label>
+        <input class="form-input" id="playerHeight" placeholder='e.g. 6&apos;2"'>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('player')">Cancel</button>
+      <button class="btn btn-primary" onclick="createPlayer()">Add Player</button>
+    </div>
+  </div>
+</div>
+
+<!-- Box Score Modal -->
+<div class="modal-overlay" id="modal-boxscore">
+  <div class="modal" style="max-width:800px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h2 id="boxScoreTitle">Box Score</h2>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('boxscore')">Close</button>
+    </div>
+    <div id="boxScoreContent"></div>
+  </div>
+</div>
+
+<script>
+// ── Supabase Init ──
+const SUPABASE_URL = 'https://alniygpluvshxzjoojao.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsbml5Z3BsdXZzaHh6am9vamFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5ODAzODcsImV4cCI6MjA4MzU1NjM4N30.6O8BPJ2tzwHAyGKz2YqcPvgZiZttGn-MGveiDkUTuOI';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── State ──
+let teams = [], players = [], games = [];
+let liveGame = null, liveSelectedPlayer = null, liveEvents = [];
+let liveHomePlayers = [], liveAwayPlayers = [];
+let liveHomeScore = 0, liveAwayScore = 0, liveQuarter = 1;
+
+// ── Init ──
+(async () => {
+  try {
+    await Promise.all([loadTeams(), loadPlayers(), loadGames()]);
+    document.getElementById('statusDot').classList.add('connected');
+    document.getElementById('statusText').textContent = 'Connected to Supabase';
+  } catch (e) {
+    document.getElementById('statusText').textContent = 'Connection failed';
+    console.error(e);
+  }
+})();
+
+// ── Tab Navigation ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('view-' + tab.dataset.view).classList.add('active');
+  });
+});
+
+// ── Data Loading ──
+async function loadTeams() {
+  const { data, error } = await sb.from('teams').select('*').order('name');
+  if (error) throw error;
+  teams = data || [];
+  renderTeams();
+  populateTeamSelects();
+}
+
+async function loadPlayers() {
+  const { data, error } = await sb.from('players').select('*, teams(name)').order('last_name');
+  if (error) throw error;
+  players = data || [];
+  renderPlayers();
+}
+
+async function loadGames() {
+  const { data, error } = await sb.from('games').select(`
+    *,
+    home:teams!games_home_team_id_fkey(id, name),
+    away:teams!games_away_team_id_fkey(id, name)
+  `).order('scheduled_at', { ascending: false });
+  if (error) throw error;
+  games = data || [];
+  renderGames();
+}
+
+// ── Render: Games ──
+function renderGames() {
+  const el = document.getElementById('gamesList');
+  document.getElementById('gameCount').textContent = games.length + ' total';
+  if (!games.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏀</div><div class="empty-title">No Games Yet</div><div class="empty-subtitle">Create your first game to get started.</div></div>`;
+    return;
+  }
+  el.innerHTML = games.map(g => {
+    const statusClass = g.status === 'live' ? 'status-live' : g.status === 'completed' ? 'status-completed' : 'status-scheduled';
+    const dt = g.scheduled_at ? new Date(g.scheduled_at).toLocaleString('en-US', { month:'short',day:'numeric',hour:'numeric',minute:'2-digit' }) : '';
+    return `<div class="card game-card" onclick="onGameClick('${g.id}')">
+      <div class="status-badge ${statusClass}">${g.status === 'live' ? '● LIVE' : g.status.toUpperCase()}</div>
+      <div class="game-teams">
+        <div class="game-team">
+          <div class="game-team-name">${g.home?.name || 'TBD'}</div>
+          <div class="game-score">${g.home_score || 0}</div>
+        </div>
+        <div class="game-vs">VS</div>
+        <div class="game-team">
+          <div class="game-team-name">${g.away?.name || 'TBD'}</div>
+          <div class="game-score">${g.away_score || 0}</div>
+        </div>
+      </div>
+      <div class="game-meta">
+        <span>${g.venue || ''}</span>
+        <span>${g.league || ''}</span>
+        <span>${dt}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Render: Teams ──
+function renderTeams() {
+  const el = document.getElementById('teamsList');
+  document.getElementById('teamCount').textContent = teams.length + ' total';
+  if (!teams.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No Teams Yet</div><div class="empty-subtitle">Create your first team to start building rosters.</div></div>`;
+    return;
+  }
+  el.innerHTML = teams.map(t => `<div class="card team-card">
+    <div class="team-logo">${t.name.charAt(0)}</div>
+    <div class="team-info">
+      <div class="team-name">${t.name}</div>
+      <div class="team-detail">${t.school || ''} ${t.league ? '· ' + t.league : ''}</div>
+    </div>
+  </div>`).join('');
+}
+
+// ── Render: Players ──
+function renderPlayers() {
+  const el = document.getElementById('playersList');
+  document.getElementById('playerCount').textContent = players.length + ' total';
+  if (!players.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🏃</div><div class="empty-title">No Players Yet</div><div class="empty-subtitle">Add players to your teams to start tracking stats.</div></div>`;
+    return;
+  }
+  el.innerHTML = players.map(p => `<div class="card player-card">
+    <div class="player-jersey"><span class="player-jersey-num">#${p.jersey_number}</span></div>
+    <div>
+      <div class="player-name">${p.first_name} ${p.last_name}</div>
+      <div class="player-detail">${p.position || ''} ${p.teams?.name ? '· ' + p.teams.name : ''} ${p.height ? '· ' + p.height : ''}</div>
+    </div>
+  </div>`).join('');
+}
+
+// ── Game Click → Live Tracker or Box Score ──
+function onGameClick(gameId) {
+  const g = games.find(x => x.id === gameId);
+  if (!g) return;
+  if (g.status === 'live') {
+    startLiveTracker(g);
+  } else {
+    openBoxScore(g);
+  }
+}
+
+// ── Box Score ──
+async function openBoxScore(game) {
+  const modal = document.getElementById('modal-boxscore');
+  const content = document.getElementById('boxScoreContent');
+  document.getElementById('boxScoreTitle').textContent = `${game.home?.name || 'Home'} vs ${game.away?.name || 'Away'}`;
+  content.innerHTML = '<div class="spinner"></div>';
+  modal.classList.add('open');
+
+  const { data: stats, error } = await sb.from('game_stats')
+    .select('*, player:players(first_name, last_name, jersey_number)')
+    .eq('game_id', game.id);
+
+  if (error || !stats?.length) {
+    content.innerHTML = `<div class="empty-state" style="padding:30px"><div class="empty-icon">📋</div><div class="empty-title">No Stats Recorded</div><div class="empty-subtitle">Stats will appear here once tracked for this game.</div></div>`;
+    return;
+  }
+
+  const homePlayers = stats.filter(s => s.team_id === game.home_team_id);
+  const awayPlayers = stats.filter(s => s.team_id === game.away_team_id);
+
+  function renderTeamTable(teamName, pStats) {
+    const totals = pStats.reduce((a, s) => ({
+      pts: a.pts + (s.points||0), reb: a.reb + (s.rebounds||0), ast: a.ast + (s.assists||0),
+      stl: a.stl + (s.steals||0), blk: a.blk + (s.blocks||0), to: a.to + (s.turnovers||0),
+      fls: a.fls + (s.fouls||0), fgm: a.fgm + (s.fg_made||0), fga: a.fga + (s.fg_attempts||0),
+      tpm: a.tpm + (s.three_pt_made||0), tpa: a.tpa + (s.three_pt_attempts||0),
+      ftm: a.ftm + (s.free_throw_made||0), fta: a.fta + (s.free_throw_attempts||0)
+    }), {pts:0,reb:0,ast:0,stl:0,blk:0,to:0,fls:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0});
+
+    return `<div style="margin-bottom:24px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-size:16px;font-weight:700;">${teamName}</span>
+        <span style="font-size:28px;font-weight:800;color:var(--court-orange);">${totals.pts}</span>
+      </div>
+      <div class="box-score"><table>
+        <tr><th>PLAYER</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TO</th><th>FLS</th><th>FG</th><th>3PT</th><th>FT</th></tr>
+        ${pStats.map(s => {
+          const name = s.player ? `#${s.player.jersey_number} ${s.player.first_name} ${s.player.last_name}` : 'Unknown';
+          return `<tr><td>${name}</td><td>${s.points||0}</td><td>${s.rebounds||0}</td><td>${s.assists||0}</td><td>${s.steals||0}</td><td>${s.blocks||0}</td><td>${s.turnovers||0}</td><td>${s.fouls||0}</td><td>${s.fg_made||0}/${s.fg_attempts||0}</td><td>${s.three_pt_made||0}/${s.three_pt_attempts||0}</td><td>${s.free_throw_made||0}/${s.free_throw_attempts||0}</td></tr>`;
+        }).join('')}
+        <tr class="totals-row"><td>TOTALS</td><td>${totals.pts}</td><td>${totals.reb}</td><td>${totals.ast}</td><td>${totals.stl}</td><td>${totals.blk}</td><td>${totals.to}</td><td>${totals.fls}</td><td>${totals.fgm}/${totals.fga}</td><td>${totals.tpm}/${totals.tpa}</td><td>${totals.ftm}/${totals.fta}</td></tr>
+      </table></div></div>`;
+  }
+
+  content.innerHTML = renderTeamTable(game.home?.name || 'Home', homePlayers) + renderTeamTable(game.away?.name || 'Away', awayPlayers);
+}
+
+// ── Live Tracker ──
+async function startLiveTracker(game) {
+  liveGame = game;
+  liveHomeScore = game.home_score || 0;
+  liveAwayScore = game.away_score || 0;
+  liveQuarter = game.current_quarter || 1;
+  liveSelectedPlayer = null;
+  liveEvents = [];
+
+  // Load players for both teams
+  const { data: hp } = await sb.from('players').select('*').eq('team_id', game.home_team_id).order('jersey_number');
+  const { data: ap } = await sb.from('players').select('*').eq('team_id', game.away_team_id).order('jersey_number');
+  liveHomePlayers = hp || [];
+  liveAwayPlayers = ap || [];
+
+  // Switch to live tab
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelector('[data-view="live"]').classList.add('active');
+  document.getElementById('view-live').classList.add('active');
+
+  renderLiveTracker();
+}
+
+function renderLiveTracker() {
+  if (!liveGame) return;
+  const el = document.getElementById('liveContent');
+  const allPlayers = [
+    ...liveHomePlayers.map(p => ({...p, side: 'home'})),
+    ...liveAwayPlayers.map(p => ({...p, side: 'away'}))
+  ];
+  const noPlayers = allPlayers.length === 0;
+
+  el.innerHTML = `
+    <div class="live-panel">
+      <div class="live-scoreboard">
+        <div class="live-team">
+          <div class="live-team-name">${liveGame.home?.name || 'Home'}</div>
+          <div class="live-team-score" id="liveHomeScore">${liveHomeScore}</div>
+        </div>
+        <div style="text-align:center;">
+          <div class="live-quarter">Q${liveQuarter}</div>
+          <div style="margin-top:8px;display:flex;gap:6px;">
+            <button class="btn btn-outline btn-sm" onclick="changeQuarter(-1)" ${liveQuarter<=1?'disabled':''}>-</button>
+            <button class="btn btn-outline btn-sm" onclick="changeQuarter(1)">+</button>
+          </div>
+        </div>
+        <div class="live-team">
+          <div class="live-team-name">${liveGame.away?.name || 'Away'}</div>
+          <div class="live-team-score" id="liveAwayScore">${liveAwayScore}</div>
+        </div>
+      </div>
+
+      ${noPlayers ? '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:14px;">No players on either roster. Add players first to track stats.</div>' : `
+      <div class="form-label" style="margin-bottom:8px;">SELECT PLAYER</div>
+      <div class="player-selector">
+        ${allPlayers.map(p => `<div class="player-chip ${liveSelectedPlayer === p.id ? 'active' : ''}" onclick="selectLivePlayer('${p.id}')" style="${p.side==='away'?'border-style:dashed;':''}">#${p.jersey_number} ${p.first_name} ${p.last_name.charAt(0)}.</div>`).join('')}
+      </div>
+
+      <div class="form-label" style="margin-bottom:8px;">SHOOTING</div>
+      <div class="stat-buttons">
+        <button class="stat-btn" onclick="recordStat('2pt_fga')" ${!liveSelectedPlayer?'disabled':''}>2PT FGA</button>
+        <button class="stat-btn" onclick="recordStat('2pt_fgm')" ${!liveSelectedPlayer?'disabled':''}>2PT FGM</button>
+        <button class="stat-btn" onclick="recordStat('3pt_fga')" ${!liveSelectedPlayer?'disabled':''}>3PT FGA</button>
+        <button class="stat-btn" onclick="recordStat('3pt_fgm')" ${!liveSelectedPlayer?'disabled':''}>3PT FGM</button>
+        <button class="stat-btn" onclick="recordStat('ft_fga')" ${!liveSelectedPlayer?'disabled':''}>FT ATT</button>
+        <button class="stat-btn" onclick="recordStat('ft_fgm')" ${!liveSelectedPlayer?'disabled':''}>FT MADE</button>
+      </div>
+      <div class="form-label" style="margin-bottom:8px;">ACTIONS</div>
+      <div class="stat-buttons">
+        <button class="stat-btn" onclick="recordStat('rebound')" ${!liveSelectedPlayer?'disabled':''}>REB</button>
+        <button class="stat-btn" onclick="recordStat('assist')" ${!liveSelectedPlayer?'disabled':''}>AST</button>
+        <button class="stat-btn" onclick="recordStat('steal')" ${!liveSelectedPlayer?'disabled':''}>STL</button>
+        <button class="stat-btn" onclick="recordStat('block')" ${!liveSelectedPlayer?'disabled':''}>BLK</button>
+        <button class="stat-btn danger" onclick="recordStat('turnover')" ${!liveSelectedPlayer?'disabled':''}>TO</button>
+        <button class="stat-btn danger" onclick="recordStat('foul')" ${!liveSelectedPlayer?'disabled':''}>FOUL</button>
+      </div>
+      `}
+
+      ${liveEvents.length ? `
+      <div class="form-label" style="margin-bottom:8px;margin-top:16px;">EVENT LOG</div>
+      <div class="event-log">
+        ${liveEvents.slice().reverse().map(ev => `<div class="event-item">
+          <span class="event-type">${ev.event_type.toUpperCase()}</span>
+          <span class="event-player">${ev._playerName || ''}</span>
+          <span class="event-time">Q${ev.quarter}</span>
+        </div>`).join('')}
+      </div>` : ''}
+
+      <div style="margin-top:16px;display:flex;gap:8px;">
+        ${liveEvents.length ? '<button class="btn btn-outline btn-sm" onclick="undoLastEvent()">Undo Last</button>' : ''}
+        <button class="btn btn-outline btn-sm" onclick="openBoxScore(liveGame)">View Box Score</button>
+        <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="endGame()">End Game</button>
+      </div>
+    </div>`;
+}
+
+function selectLivePlayer(id) {
+  liveSelectedPlayer = liveSelectedPlayer === id ? null : id;
+  renderLiveTracker();
+}
+
+async function changeQuarter(delta) {
+  liveQuarter = Math.max(1, liveQuarter + delta);
+  await sb.from('games').update({ current_quarter: liveQuarter }).eq('id', liveGame.id);
+  renderLiveTracker();
+}
+
+async function recordStat(eventType) {
+  if (!liveSelectedPlayer || !liveGame) return;
+  const allP = [...liveHomePlayers, ...liveAwayPlayers];
+  const player = allP.find(p => p.id === liveSelectedPlayer);
+  if (!player) return;
+  const teamId = player.team_id;
+
+  // Insert stat event
+  const { data, error } = await sb.from('stat_events').insert({
+    game_id: liveGame.id,
+    player_id: player.id,
+    team_id: teamId,
+    event_type: eventType,
+    quarter: liveQuarter,
+    timestamp: new Date().toISOString(),
+  }).select().single();
+
+  if (error) { toast('Failed to record stat', 'error'); console.error(error); return; }
+
+  data._playerName = `#${player.jersey_number} ${player.first_name} ${player.last_name}`;
+  liveEvents.push(data);
+
+  // Update game_stats (upsert)
+  await updateGameStats(liveGame.id, player.id, teamId, eventType);
+
+  // Update scores
+  if (['2pt_fgm','3pt_fgm','ft_fgm'].includes(eventType)) {
+    const pts = eventType === '3pt_fgm' ? 3 : eventType === '2pt_fgm' ? 2 : 1;
+    if (teamId === liveGame.home_team_id) liveHomeScore += pts;
+    else liveAwayScore += pts;
+    await sb.from('games').update({ home_score: liveHomeScore, away_score: liveAwayScore }).eq('id', liveGame.id);
+  }
+
+  toast(`${eventType.toUpperCase()} — ${player.first_name} ${player.last_name}`, 'success');
+  renderLiveTracker();
+}
+
+async function updateGameStats(gameId, playerId, teamId, eventType) {
+  // Fetch existing stats
+  let { data: existing } = await sb.from('game_stats')
+    .select('*').eq('game_id', gameId).eq('player_id', playerId).single();
+
+  const inc = {};
+  if (eventType === '2pt_fgm') { inc.fg_made = 1; inc.fg_attempts = 1; inc.points = 2; }
+  else if (eventType === '2pt_fga') { inc.fg_attempts = 1; }
+  else if (eventType === '3pt_fgm') { inc.three_pt_made = 1; inc.three_pt_attempts = 1; inc.points = 3; }
+  else if (eventType === '3pt_fga') { inc.three_pt_attempts = 1; }
+  else if (eventType === 'ft_fgm') { inc.free_throw_made = 1; inc.free_throw_attempts = 1; inc.points = 1; }
+  else if (eventType === 'ft_fga') { inc.free_throw_attempts = 1; }
+  else if (eventType === 'rebound') { inc.rebounds = 1; }
+  else if (eventType === 'assist') { inc.assists = 1; }
+  else if (eventType === 'steal') { inc.steals = 1; }
+  else if (eventType === 'block') { inc.blocks = 1; }
+  else if (eventType === 'turnover') { inc.turnovers = 1; }
+  else if (eventType === 'foul') { inc.fouls = 1; }
+
+  if (existing) {
+    const upd = {};
+    for (const [k, v] of Object.entries(inc)) upd[k] = (existing[k] || 0) + v;
+    upd.updated_at = new Date().toISOString();
+    await sb.from('game_stats').update(upd).eq('id', existing.id);
+  } else {
+    const row = {
+      game_id: gameId, player_id: playerId, team_id: teamId,
+      points:0, rebounds:0, assists:0, steals:0, blocks:0, turnovers:0, fouls:0,
+      fg_attempts:0, fg_made:0, three_pt_attempts:0, three_pt_made:0,
+      free_throw_attempts:0, free_throw_made:0,
+    };
+    for (const [k, v] of Object.entries(inc)) row[k] = v;
+    await sb.from('game_stats').insert(row);
+  }
+}
+
+async function undoLastEvent() {
+  if (!liveEvents.length) return;
+  const last = liveEvents.pop();
+  await sb.from('stat_events').delete().eq('id', last.id);
+  // Reverse the game_stats increment
+  const { data: existing } = await sb.from('game_stats')
+    .select('*').eq('game_id', last.game_id).eq('player_id', last.player_id).single();
+  if (existing) {
+    const dec = {};
+    const et = last.event_type;
+    if (et === '2pt_fgm') { dec.fg_made = -1; dec.fg_attempts = -1; dec.points = -2; }
+    else if (et === '2pt_fga') { dec.fg_attempts = -1; }
+    else if (et === '3pt_fgm') { dec.three_pt_made = -1; dec.three_pt_attempts = -1; dec.points = -3; }
+    else if (et === '3pt_fga') { dec.three_pt_attempts = -1; }
+    else if (et === 'ft_fgm') { dec.free_throw_made = -1; dec.free_throw_attempts = -1; dec.points = -1; }
+    else if (et === 'ft_fga') { dec.free_throw_attempts = -1; }
+    else if (et === 'rebound') dec.rebounds = -1;
+    else if (et === 'assist') dec.assists = -1;
+    else if (et === 'steal') dec.steals = -1;
+    else if (et === 'block') dec.blocks = -1;
+    else if (et === 'turnover') dec.turnovers = -1;
+    else if (et === 'foul') dec.fouls = -1;
+    const upd = {};
+    for (const [k, v] of Object.entries(dec)) upd[k] = Math.max(0, (existing[k] || 0) + v);
+    await sb.from('game_stats').update(upd).eq('id', existing.id);
+  }
+  // Reverse score
+  if (['2pt_fgm','3pt_fgm','ft_fgm'].includes(last.event_type)) {
+    const pts = last.event_type === '3pt_fgm' ? 3 : last.event_type === '2pt_fgm' ? 2 : 1;
+    if (last.team_id === liveGame.home_team_id) liveHomeScore = Math.max(0, liveHomeScore - pts);
+    else liveAwayScore = Math.max(0, liveAwayScore - pts);
+    await sb.from('games').update({ home_score: liveHomeScore, away_score: liveAwayScore }).eq('id', liveGame.id);
+  }
+  toast('Undone: ' + last.event_type.toUpperCase(), 'success');
+  renderLiveTracker();
+}
+
+async function endGame() {
+  if (!liveGame) return;
+  await sb.from('games').update({ status: 'completed' }).eq('id', liveGame.id);
+  toast('Game ended', 'success');
+  liveGame = null;
+  await loadGames();
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelector('[data-view="games"]').classList.add('active');
+  document.getElementById('view-games').classList.add('active');
+  document.getElementById('liveContent').innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">Select a Live Game</div><div class="empty-subtitle">Go to Games tab and click a live game to start tracking stats.</div></div>`;
+}
+
+// ── Create Functions ──
+function populateTeamSelects() {
+  const selects = ['gameHomeTeam', 'gameAwayTeam', 'playerTeam'];
+  selects.forEach(id => {
+    const el = document.getElementById(id);
+    el.innerHTML = '<option value="">Select team...</option>' + teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  });
+}
+
+async function createTeam() {
+  const name = document.getElementById('teamName').value.trim();
+  const school = document.getElementById('teamSchool').value.trim();
+  const league = document.getElementById('teamLeague').value.trim();
+  if (!name) { toast('Team name is required', 'error'); return; }
+  const { error } = await sb.from('teams').insert({ name, school, league });
+  if (error) { toast('Failed: ' + error.message, 'error'); return; }
+  toast('Team created!', 'success');
+  closeModal('team');
+  document.getElementById('teamName').value = '';
+  document.getElementById('teamSchool').value = '';
+  document.getElementById('teamLeague').value = '';
+  await loadTeams();
+}
+
+async function createPlayer() {
+  const team_id = document.getElementById('playerTeam').value;
+  const first_name = document.getElementById('playerFirst').value.trim();
+  const last_name = document.getElementById('playerLast').value.trim();
+  const jersey_number = parseInt(document.getElementById('playerJersey').value) || 0;
+  const position = document.getElementById('playerPosition').value;
+  const grade = document.getElementById('playerGrade').value ? parseInt(document.getElementById('playerGrade').value) : null;
+  const height = document.getElementById('playerHeight').value.trim() || null;
+  if (!team_id || !first_name || !last_name) { toast('Team, first name, and last name are required', 'error'); return; }
+  const { error } = await sb.from('players').insert({ team_id, first_name, last_name, jersey_number, position, grade, height });
+  if (error) { toast('Failed: ' + error.message, 'error'); return; }
+  toast('Player added!', 'success');
+  closeModal('player');
+  ['playerFirst','playerLast','playerJersey','playerHeight'].forEach(id => document.getElementById(id).value = '');
+  await loadPlayers();
+}
+
+async function createGame() {
+  const home_team_id = document.getElementById('gameHomeTeam').value;
+  const away_team_id = document.getElementById('gameAwayTeam').value;
+  const venue = document.getElementById('gameVenue').value.trim();
+  const league = document.getElementById('gameLeague').value.trim();
+  const scheduled_at = document.getElementById('gameDate').value ? new Date(document.getElementById('gameDate').value).toISOString() : new Date().toISOString();
+  const status = document.getElementById('gameStatus').value;
+  if (!home_team_id || !away_team_id) { toast('Select both teams', 'error'); return; }
+  if (home_team_id === away_team_id) { toast('Teams must be different', 'error'); return; }
+  const { error } = await sb.from('games').insert({ home_team_id, away_team_id, venue, league, scheduled_at, status, home_score: 0, away_score: 0, current_quarter: 1 });
+  if (error) { toast('Failed: ' + error.message, 'error'); return; }
+  toast('Game created!', 'success');
+  closeModal('game');
+  ['gameVenue','gameLeague'].forEach(id => document.getElementById(id).value = '');
+  await loadGames();
+}
+
+// ── Modal Helpers ──
+function openModal(type) { document.getElementById('modal-' + type).classList.add('open'); }
+function closeModal(type) { document.getElementById('modal-' + type).classList.remove('open'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+// ── Toast ──
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
