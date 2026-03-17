@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
-  Text,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,32 +9,19 @@ import {
   TouchableOpacity,
   Easing,
 } from 'react-native';
-import { TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
 import { useAuth } from '../../hooks/useAuth';
-import { spacing } from '../../config/theme';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
 import { UserRole } from '../../types/user';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+import { H2 } from '@/components/ui/typography';
+import { cn } from '@/lib/utils';
 
 const { width, height } = Dimensions.get('window');
-
-// Court Vision Design System
-const courtColors = {
-  deepNavy: '#0A1929',
-  courtOrange: '#FF6B35',
-  courtOrangeLight: '#FF8A5B',
-  courtOrangeDark: '#E55A25',
-  white: '#FFFFFF',
-  offWhite: '#F8F9FA',
-  textMuted: '#6B7280',
-  courtLine: 'rgba(255, 107, 53, 0.15)',
-  inputBg: 'rgba(255, 255, 255, 0.08)',
-  inputBorder: 'rgba(255, 255, 255, 0.12)',
-  error: '#EF4444',
-  success: '#10B981',
-};
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
@@ -174,264 +159,273 @@ const SignUpScreen: React.FC = () => {
   });
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-background">
       {/* Background */}
-      <View style={styles.backgroundContainer}>
-        <View style={[styles.diagonalStripe, styles.diagonalStripe1]} />
-        <View style={[styles.diagonalStripe, styles.diagonalStripe2]} />
+      <View className="absolute inset-0 overflow-hidden">
+        <View
+          className="absolute bg-primary opacity-[0.06]"
+          style={{
+            width: width * 2,
+            height: height * 0.5,
+            top: -height * 0.4,
+            left: -width * 0.5,
+            transform: [{ rotate: '-15deg' }],
+          }}
+        />
+        <View
+          className="absolute bg-primary opacity-[0.03]"
+          style={{
+            width: width * 2,
+            height: height * 0.5,
+            top: -height * 0.32,
+            left: -width * 0.3,
+            transform: [{ rotate: '-15deg' }],
+          }}
+        />
       </View>
 
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <Text style={styles.backButtonText}>←</Text>
+      <View
+        className="flex-row items-center px-6 pb-4"
+        style={{ paddingTop: Platform.OS === 'ios' ? 60 : 40 }}
+      >
+        <TouchableOpacity
+          className="w-11 h-11 rounded-full bg-foreground/[0.08] justify-center items-center mr-4"
+          onPress={handleBack}
+        >
+          <Text className="text-foreground text-2xl font-light">←</Text>
         </TouchableOpacity>
-        <View style={styles.progressContainer}>
-          <View style={styles.progressTrack}>
+        <View className="flex-1">
+          <View className="h-1 bg-foreground/10 rounded-full overflow-hidden mb-1">
             <Animated.View
-              style={[
-                styles.progressFill,
-                { width: progressAnim.interpolate({
+              className="h-full bg-primary rounded-full"
+              style={{
+                width: progressAnim.interpolate({
                   inputRange: [0, 1],
                   outputRange: ['0%', '100%'],
-                }) },
-              ]}
+                }),
+              }}
             />
           </View>
-          <Text style={styles.progressText}>Step {step} of 2</Text>
+          <Text className="text-muted-foreground text-xs font-semibold tracking-wider">
+            Step {step} of 2
+          </Text>
         </View>
       </View>
 
       <KeyboardAvoidingView
-        style={styles.keyboardView}
+        className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{ flexGrow: 1 }}
+          className="px-6 pb-12"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
           <Animated.View
-            style={[
-              styles.content,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
+            className="w-full max-w-[400px] self-center"
+            style={{
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            }}
           >
             {step === 1 ? (
               <Animated.View
-                style={[
-                  styles.stepContainer,
-                  {
-                    opacity: stepOpacity,
-                    transform: [{ translateY: stepTranslate }],
-                  },
-                ]}
+                className="w-full"
+                style={{
+                  opacity: stepOpacity,
+                  transform: [{ translateY: stepTranslate }],
+                }}
               >
-                <Text style={styles.title}>CREATE{'\n'}ACCOUNT</Text>
-                <Text style={styles.subtitle}>Join the court today</Text>
+                <H2 className="text-[38px] font-black text-foreground tracking-widest leading-[44px] mb-2 border-b-0">
+                  {'CREATE\nACCOUNT'}
+                </H2>
+                <Text className="text-base text-muted-foreground mb-8 tracking-wide">
+                  Join the court today
+                </Text>
 
-                <View style={styles.form}>
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>FULL NAME</Text>
-                    <TextInput
+                <View className="w-full gap-6">
+                  <View>
+                    <Text className="text-[11px] font-bold text-primary tracking-[2px] mb-1">
+                      FULL NAME
+                    </Text>
+                    <Input
                       value={fullName}
                       onChangeText={setFullName}
-                      mode="flat"
                       placeholder="John Smith"
-                      placeholderTextColor={courtColors.textMuted}
-                      error={!!errors.fullName}
-                      style={styles.input}
-                      textColor={courtColors.white}
-                      underlineColor="transparent"
-                      activeUnderlineColor={courtColors.courtOrange}
-                      theme={{
-                        colors: {
-                          background: 'transparent',
-                          placeholder: courtColors.textMuted,
-                        },
-                      }}
+                      className={cn(
+                        'bg-transparent border-0 border-b-2 rounded-none px-0 h-12 text-base text-foreground',
+                        errors.fullName ? 'border-b-destructive' : 'border-b-border'
+                      )}
                     />
-                    <View style={[styles.inputUnderline, errors.fullName && styles.inputUnderlineError]} />
-                    {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+                    {errors.fullName && (
+                      <Text className="text-destructive text-xs mt-1 font-medium">{errors.fullName}</Text>
+                    )}
                   </View>
 
-                  <View style={styles.inputContainer}>
-                    <Text style={styles.inputLabel}>EMAIL</Text>
-                    <TextInput
+                  <View>
+                    <Text className="text-[11px] font-bold text-primary tracking-[2px] mb-1">
+                      EMAIL
+                    </Text>
+                    <Input
                       value={email}
                       onChangeText={setEmail}
-                      mode="flat"
                       keyboardType="email-address"
                       autoCapitalize="none"
                       placeholder="your@email.com"
-                      placeholderTextColor={courtColors.textMuted}
-                      error={!!errors.email}
-                      style={styles.input}
-                      textColor={courtColors.white}
-                      underlineColor="transparent"
-                      activeUnderlineColor={courtColors.courtOrange}
-                      theme={{
-                        colors: {
-                          background: 'transparent',
-                          placeholder: courtColors.textMuted,
-                        },
-                      }}
+                      className={cn(
+                        'bg-transparent border-0 border-b-2 rounded-none px-0 h-12 text-base text-foreground',
+                        errors.email ? 'border-b-destructive' : 'border-b-border'
+                      )}
                     />
-                    <View style={[styles.inputUnderline, errors.email && styles.inputUnderlineError]} />
-                    {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+                    {errors.email && (
+                      <Text className="text-destructive text-xs mt-1 font-medium">{errors.email}</Text>
+                    )}
                   </View>
 
-                  <View style={styles.row}>
-                    <View style={[styles.inputContainer, styles.halfInput]}>
-                      <Text style={styles.inputLabel}>PASSWORD</Text>
-                      <TextInput
+                  <View className="flex-row gap-4">
+                    <View className="flex-1">
+                      <Text className="text-[11px] font-bold text-primary tracking-[2px] mb-1">
+                        PASSWORD
+                      </Text>
+                      <Input
                         value={password}
                         onChangeText={setPassword}
-                        mode="flat"
                         secureTextEntry
                         placeholder="••••••••"
-                        placeholderTextColor={courtColors.textMuted}
-                        error={!!errors.password}
-                        style={styles.input}
-                        textColor={courtColors.white}
-                        underlineColor="transparent"
-                        activeUnderlineColor={courtColors.courtOrange}
-                        theme={{
-                          colors: {
-                            background: 'transparent',
-                            placeholder: courtColors.textMuted,
-                          },
-                        }}
+                        className={cn(
+                          'bg-transparent border-0 border-b-2 rounded-none px-0 h-12 text-base text-foreground',
+                          errors.password ? 'border-b-destructive' : 'border-b-border'
+                        )}
                       />
-                      <View style={[styles.inputUnderline, errors.password && styles.inputUnderlineError]} />
-                      {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+                      {errors.password && (
+                        <Text className="text-destructive text-xs mt-1 font-medium">{errors.password}</Text>
+                      )}
                     </View>
 
-                    <View style={[styles.inputContainer, styles.halfInput]}>
-                      <Text style={styles.inputLabel}>CONFIRM</Text>
-                      <TextInput
+                    <View className="flex-1">
+                      <Text className="text-[11px] font-bold text-primary tracking-[2px] mb-1">
+                        CONFIRM
+                      </Text>
+                      <Input
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
-                        mode="flat"
                         secureTextEntry
                         placeholder="••••••••"
-                        placeholderTextColor={courtColors.textMuted}
-                        error={!!errors.confirmPassword}
-                        style={styles.input}
-                        textColor={courtColors.white}
-                        underlineColor="transparent"
-                        activeUnderlineColor={courtColors.courtOrange}
-                        theme={{
-                          colors: {
-                            background: 'transparent',
-                            placeholder: courtColors.textMuted,
-                          },
-                        }}
+                        className={cn(
+                          'bg-transparent border-0 border-b-2 rounded-none px-0 h-12 text-base text-foreground',
+                          errors.confirmPassword ? 'border-b-destructive' : 'border-b-border'
+                        )}
                       />
-                      <View style={[styles.inputUnderline, errors.confirmPassword && styles.inputUnderlineError]} />
                       {errors.confirmPassword && (
-                        <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+                        <Text className="text-destructive text-xs mt-1 font-medium">{errors.confirmPassword}</Text>
                       )}
                     </View>
                   </View>
 
-                  <TouchableOpacity
-                    style={styles.continueButton}
+                  <Button
                     onPress={handleContinue}
-                    activeOpacity={0.85}
+                    size="lg"
+                    className="rounded-xl h-14 mt-4"
                   >
-                    <View style={styles.buttonGradient}>
-                      <Text style={styles.continueButtonText}>CONTINUE</Text>
-                      <View style={styles.buttonArrow}>
-                        <Text style={styles.buttonArrowText}>→</Text>
-                      </View>
+                    <Text className="text-primary-foreground text-base font-extrabold tracking-[2px]">
+                      CONTINUE
+                    </Text>
+                    <View className="ml-2 bg-white/20 rounded-xl w-6 h-6 justify-center items-center">
+                      <Text className="text-primary-foreground text-base font-semibold">→</Text>
                     </View>
-                  </TouchableOpacity>
+                  </Button>
                 </View>
               </Animated.View>
             ) : (
               <Animated.View
-                style={[
-                  styles.stepContainer,
-                  {
-                    opacity: stepOpacity,
-                    transform: [{ translateY: stepTranslate }],
-                  },
-                ]}
+                className="w-full"
+                style={{
+                  opacity: stepOpacity,
+                  transform: [{ translateY: stepTranslate }],
+                }}
               >
-                <Text style={styles.title}>SELECT{'\n'}YOUR ROLE</Text>
-                <Text style={styles.subtitle}>How will you use Balling Out Loud?</Text>
+                <H2 className="text-[38px] font-black text-foreground tracking-widest leading-[44px] mb-2 border-b-0">
+                  {'SELECT\nYOUR ROLE'}
+                </H2>
+                <Text className="text-base text-muted-foreground mb-8 tracking-wide">
+                  How will you use Balling Out Loud?
+                </Text>
 
-                <View style={styles.rolesContainer}>
-                  {roleOptions.map((role, index) => (
+                <View className="mb-6 gap-3">
+                  {roleOptions.map((role) => (
                     <TouchableOpacity
                       key={role.value}
-                      style={[
-                        styles.roleCard,
-                        selectedRole === role.value && styles.roleCardSelected,
-                      ]}
+                      className={cn(
+                        'flex-row items-center rounded-2xl p-4 border-2',
+                        selectedRole === role.value
+                          ? 'bg-primary/10 border-primary'
+                          : 'bg-foreground/[0.04] border-transparent'
+                      )}
                       onPress={() => setSelectedRole(role.value)}
                       activeOpacity={0.8}
                     >
-                      <View style={styles.roleIconContainer}>
-                        <Text style={styles.roleIcon}>{role.icon}</Text>
+                      <View className="w-[50px] h-[50px] rounded-xl bg-foreground/[0.06] justify-center items-center mr-4">
+                        <Text className="text-2xl">{role.icon}</Text>
                       </View>
-                      <View style={styles.roleInfo}>
-                        <Text style={[
-                          styles.roleLabel,
-                          selectedRole === role.value && styles.roleLabelSelected,
-                        ]}>
+                      <View className="flex-1">
+                        <Text
+                          className={cn(
+                            'text-base font-bold mb-0.5',
+                            selectedRole === role.value ? 'text-primary' : 'text-foreground'
+                          )}
+                        >
                           {role.label}
                         </Text>
-                        <Text style={styles.roleDescription}>{role.description}</Text>
+                        <Text className="text-[13px] text-muted-foreground">{role.description}</Text>
                       </View>
-                      <View style={[
-                        styles.roleRadio,
-                        selectedRole === role.value && styles.roleRadioSelected,
-                      ]}>
+                      <View
+                        className={cn(
+                          'w-6 h-6 rounded-full border-2 justify-center items-center',
+                          selectedRole === role.value ? 'border-primary' : 'border-border'
+                        )}
+                      >
                         {selectedRole === role.value && (
-                          <View style={styles.roleRadioInner} />
+                          <View className="w-3 h-3 rounded-full bg-primary" />
                         )}
                       </View>
                     </TouchableOpacity>
                   ))}
                 </View>
 
-                {errors.role && <Text style={styles.errorTextCenter}>{errors.role}</Text>}
+                {errors.role && (
+                  <Text className="text-destructive text-sm mb-4 font-medium text-center">{errors.role}</Text>
+                )}
                 {error && (
-                  <View style={styles.apiErrorContainer}>
-                    <Text style={styles.apiErrorText}>{error}</Text>
+                  <View className="bg-destructive/15 rounded-lg p-4 mb-4 border-l-[3px] border-l-destructive">
+                    <Text className="text-destructive text-sm font-medium">{error}</Text>
                   </View>
                 )}
 
-                <TouchableOpacity
-                  style={[styles.continueButton, isLoading && styles.continueButtonDisabled]}
+                <Button
                   onPress={handleSignUp}
                   disabled={isLoading}
-                  activeOpacity={0.85}
+                  size="lg"
+                  className="rounded-xl h-14 mt-4"
                 >
-                  <View style={styles.buttonGradient}>
-                    <Text style={styles.continueButtonText}>
-                      {isLoading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
-                    </Text>
-                    {!isLoading && (
-                      <View style={styles.buttonArrow}>
-                        <Text style={styles.buttonArrowText}>→</Text>
-                      </View>
-                    )}
-                  </View>
-                </TouchableOpacity>
+                  <Text className="text-primary-foreground text-base font-extrabold tracking-[2px]">
+                    {isLoading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
+                  </Text>
+                  {!isLoading && (
+                    <View className="ml-2 bg-white/20 rounded-xl w-6 h-6 justify-center items-center">
+                      <Text className="text-primary-foreground text-base font-semibold">→</Text>
+                    </View>
+                  )}
+                </Button>
               </Animated.View>
             )}
 
             {/* Sign In Link */}
-            <View style={styles.signInContainer}>
-              <Text style={styles.signInText}>Already have an account? </Text>
+            <View className="flex-row justify-center mt-8">
+              <Text className="text-muted-foreground text-[15px]">Already have an account? </Text>
               <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.signInLink}>Sign In</Text>
+                <Text className="text-primary text-[15px] font-bold tracking-wide">Sign In</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -440,279 +434,5 @@ const SignUpScreen: React.FC = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: courtColors.deepNavy,
-  },
-  backgroundContainer: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
-  diagonalStripe: {
-    position: 'absolute',
-    width: width * 2,
-    height: height * 0.5,
-    backgroundColor: courtColors.courtOrange,
-    transform: [{ rotate: '-15deg' }],
-  },
-  diagonalStripe1: {
-    top: -height * 0.4,
-    left: -width * 0.5,
-    opacity: 0.06,
-  },
-  diagonalStripe2: {
-    top: -height * 0.32,
-    left: -width * 0.3,
-    opacity: 0.03,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  backButtonText: {
-    color: courtColors.white,
-    fontSize: 24,
-    fontWeight: '300',
-  },
-  progressContainer: {
-    flex: 1,
-  },
-  progressTrack: {
-    height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 2,
-    overflow: 'hidden',
-    marginBottom: spacing.xs,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: courtColors.courtOrange,
-    borderRadius: 2,
-  },
-  progressText: {
-    color: courtColors.textMuted,
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
-  },
-  content: {
-    width: '100%',
-    maxWidth: 400,
-    alignSelf: 'center',
-  },
-  stepContainer: {
-    width: '100%',
-  },
-  title: {
-    fontSize: 38,
-    fontWeight: '900',
-    color: courtColors.white,
-    letterSpacing: 2,
-    lineHeight: 44,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: courtColors.textMuted,
-    marginBottom: spacing.xl,
-    letterSpacing: 0.5,
-  },
-  form: {
-    width: '100%',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  halfInput: {
-    flex: 1,
-  },
-  inputContainer: {
-    marginBottom: spacing.lg,
-  },
-  inputLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: courtColors.courtOrange,
-    letterSpacing: 2,
-    marginBottom: spacing.xs,
-  },
-  input: {
-    backgroundColor: 'transparent',
-    fontSize: 16,
-    paddingHorizontal: 0,
-    height: 48,
-  },
-  inputUnderline: {
-    height: 2,
-    backgroundColor: courtColors.inputBorder,
-    marginTop: -8,
-  },
-  inputUnderlineError: {
-    backgroundColor: courtColors.error,
-  },
-  errorText: {
-    color: courtColors.error,
-    fontSize: 12,
-    marginTop: spacing.xs,
-    fontWeight: '500',
-  },
-  errorTextCenter: {
-    color: courtColors.error,
-    fontSize: 14,
-    marginBottom: spacing.md,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  apiErrorContainer: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderRadius: 8,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: courtColors.error,
-  },
-  apiErrorText: {
-    color: courtColors.error,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  rolesContainer: {
-    marginBottom: spacing.lg,
-  },
-  roleCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: 16,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  roleCardSelected: {
-    backgroundColor: 'rgba(255, 107, 53, 0.1)',
-    borderColor: courtColors.courtOrange,
-  },
-  roleIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: spacing.md,
-  },
-  roleIcon: {
-    fontSize: 24,
-  },
-  roleInfo: {
-    flex: 1,
-  },
-  roleLabel: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: courtColors.white,
-    marginBottom: 2,
-  },
-  roleLabelSelected: {
-    color: courtColors.courtOrange,
-  },
-  roleDescription: {
-    fontSize: 13,
-    color: courtColors.textMuted,
-  },
-  roleRadio: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: courtColors.inputBorder,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  roleRadioSelected: {
-    borderColor: courtColors.courtOrange,
-  },
-  roleRadioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: courtColors.courtOrange,
-  },
-  continueButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginTop: spacing.md,
-  },
-  continueButtonDisabled: {
-    opacity: 0.6,
-  },
-  buttonGradient: {
-    backgroundColor: courtColors.courtOrange,
-    paddingVertical: 18,
-    paddingHorizontal: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  continueButtonText: {
-    color: courtColors.white,
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 2,
-  },
-  buttonArrow: {
-    marginLeft: spacing.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonArrowText: {
-    color: courtColors.white,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  signInContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: spacing.xl,
-  },
-  signInText: {
-    color: courtColors.textMuted,
-    fontSize: 15,
-  },
-  signInLink: {
-    color: courtColors.courtOrange,
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-});
 
 export default SignUpScreen;

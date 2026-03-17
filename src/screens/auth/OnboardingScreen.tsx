@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
-  Text,
-  StyleSheet,
   Dimensions,
   Animated,
   TouchableOpacity,
@@ -15,20 +13,11 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
-import { spacing } from '../../config/theme';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+import { H1 } from '@/components/ui/typography';
 
 const { width, height } = Dimensions.get('window');
-
-// Court Vision Design System
-const courtColors = {
-  deepNavy: '#0A1929',
-  midNavy: '#0D2137',
-  courtOrange: '#FF6B35',
-  courtOrangeLight: '#FF8A5B',
-  white: '#FFFFFF',
-  textMuted: '#6B7280',
-  courtLine: 'rgba(255, 107, 53, 0.2)',
-};
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
@@ -164,129 +153,139 @@ const OnboardingScreen: React.FC = () => {
     });
 
     return (
-      <View style={styles.slide}>
+      <View style={{ width }} className="justify-center items-center px-8">
         <Animated.View
-          style={[
-            styles.slideContent,
-            {
-              opacity,
-              transform: [{ scale }, { translateY }],
-            },
-          ]}
+          className="items-center max-w-[340px]"
+          style={{
+            opacity,
+            transform: [{ scale }, { translateY }],
+          }}
         >
           {/* Large Icon */}
-          <View style={[styles.iconContainer, { backgroundColor: `${item.accentColor}20` }]}>
-            <Text style={styles.slideIcon}>{item.icon}</Text>
-            <View style={[styles.iconGlow, { backgroundColor: item.accentColor }]} />
+          <View
+            className="w-[120px] h-[120px] rounded-3xl justify-center items-center mb-8 relative"
+            style={{ backgroundColor: `${item.accentColor}20` }}
+          >
+            <Text className="text-[56px]">{item.icon}</Text>
+            <View
+              className="absolute w-[60px] h-[60px] rounded-full opacity-20 scale-[2]"
+              style={{ backgroundColor: item.accentColor }}
+            />
           </View>
 
           {/* Title */}
-          <Text style={styles.slideTitle}>{item.title}</Text>
-          <Text style={[styles.slideSubtitle, { color: item.accentColor }]}>
+          <H1 className="text-[48px] font-black text-foreground tracking-[6px] mb-1 text-center">
+            {item.title}
+          </H1>
+          <Text
+            className="text-xl font-bold tracking-[3px] mb-6 text-center"
+            style={{ color: item.accentColor }}
+          >
             {item.subtitle}
           </Text>
-          <Text style={styles.slideDescription}>{item.description}</Text>
+          <Text className="text-base text-muted-foreground text-center leading-6 px-4">
+            {item.description}
+          </Text>
         </Animated.View>
       </View>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-background">
       {/* Background Elements */}
-      <View style={styles.backgroundContainer}>
+      <View className="absolute inset-0 overflow-hidden">
         {/* Diagonal court lines */}
         <Animated.View
-          style={[
-            styles.courtLine,
-            styles.courtLine1,
-            {
-              width: courtLineAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0%', '200%'],
-              }),
-            },
-          ]}
+          className="absolute h-[2px] bg-primary/20"
+          style={{
+            top: height * 0.15,
+            left: -width * 0.5,
+            transform: [{ rotate: '-25deg' }],
+            width: courtLineAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['0%', '200%'],
+            }),
+          }}
         />
         <Animated.View
-          style={[
-            styles.courtLine,
-            styles.courtLine2,
-            {
-              width: courtLineAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0%', '200%'],
-              }),
-            },
-          ]}
+          className="absolute h-[2px] bg-primary/20 opacity-50"
+          style={{
+            top: height * 0.45,
+            left: -width * 0.3,
+            transform: [{ rotate: '-25deg' }],
+            width: courtLineAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['0%', '200%'],
+            }),
+          }}
         />
         <Animated.View
-          style={[
-            styles.courtLine,
-            styles.courtLine3,
-            {
-              width: courtLineAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0%', '150%'],
-              }),
-            },
-          ]}
+          className="absolute h-[2px] bg-primary/20 opacity-30"
+          style={{
+            top: height * 0.75,
+            left: -width * 0.2,
+            transform: [{ rotate: '-25deg' }],
+            width: courtLineAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['0%', '150%'],
+            }),
+          }}
         />
 
         {/* Center court circle */}
         <Animated.View
-          style={[
-            styles.centerCourt,
-            {
-              opacity: courtLineAnim,
-              transform: [
-                {
-                  scale: courtLineAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.5, 1],
-                  }),
-                },
-              ],
-            },
-          ]}
+          className="absolute w-40 h-40 rounded-full border-2 border-primary/20 opacity-50"
+          style={{
+            top: height * 0.35,
+            right: -80,
+            opacity: courtLineAnim,
+            transform: [
+              {
+                scale: courtLineAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.5, 1],
+                }),
+              },
+            ],
+          }}
         />
       </View>
 
       {/* Header with Logo */}
       <Animated.View
-        style={[
-          styles.header,
-          {
-            opacity: fadeAnim,
-            transform: [{ scale: logoScale }],
-          },
-        ]}
+        className="items-center px-6"
+        style={{
+          paddingTop: Platform.OS === 'ios' ? 80 : 60,
+          opacity: fadeAnim,
+          transform: [{ scale: logoScale }],
+        }}
       >
         <Animated.View
-          style={[
-            styles.logoContainer,
-            { transform: [{ rotate: rotateInterpolation }] },
-          ]}
+          className="mb-4"
+          style={{ transform: [{ rotate: rotateInterpolation }] }}
         >
-          <View style={styles.basketballLogo}>
-            <View style={styles.ballLine1} />
-            <View style={styles.ballLine2} />
-            <View style={styles.ballLine3} />
+          <View className="w-[70px] h-[70px] rounded-full border-[3px] border-primary justify-center items-center overflow-hidden bg-primary/15">
+            <View className="absolute w-full h-[2px] bg-primary" />
+            <View className="absolute w-[2px] h-full bg-primary" />
+            <View className="absolute w-[140%] h-[2px] bg-primary rotate-45" />
           </View>
         </Animated.View>
-        <Text style={styles.appName}>BALLING OUT LOUD</Text>
-        <Text style={styles.tagline}>Track. Analyze. Excel.</Text>
+        <Text className="text-2xl font-black text-foreground tracking-[4px] mb-1">
+          BALLING OUT LOUD
+        </Text>
+        <Text className="text-sm text-primary font-semibold tracking-[2px]">
+          Track. Analyze. Excel.
+        </Text>
       </Animated.View>
 
       {/* Slides */}
       <Animated.View
-        style={[
-          styles.slidesContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: contentSlide }],
-          },
-        ]}
+        className="flex-1 justify-center"
+        style={{
+          opacity: fadeAnim,
+          transform: [{ translateY: contentSlide }],
+        }}
       >
         <FlatList
           ref={flatListRef}
@@ -303,7 +302,7 @@ const OnboardingScreen: React.FC = () => {
         />
 
         {/* Pagination Dots */}
-        <View style={styles.pagination}>
+        <View className="flex-row justify-center items-center py-6 gap-2">
           {slides.map((slide, index) => {
             const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
             const dotWidth = scrollX.interpolate({
@@ -318,7 +317,7 @@ const OnboardingScreen: React.FC = () => {
             });
             const dotColor = scrollX.interpolate({
               inputRange,
-              outputRange: [courtColors.textMuted, slide.accentColor, courtColors.textMuted],
+              outputRange: ['#6B7280', slide.accentColor, '#6B7280'],
               extrapolate: 'clamp',
             });
 
@@ -329,14 +328,12 @@ const OnboardingScreen: React.FC = () => {
                 activeOpacity={0.7}
               >
                 <Animated.View
-                  style={[
-                    styles.dot,
-                    {
-                      width: dotWidth,
-                      opacity: dotOpacity,
-                      backgroundColor: dotColor,
-                    },
-                  ]}
+                  className="h-2 rounded-full"
+                  style={{
+                    width: dotWidth,
+                    opacity: dotOpacity,
+                    backgroundColor: dotColor,
+                  }}
                 />
               </TouchableOpacity>
             );
@@ -346,245 +343,38 @@ const OnboardingScreen: React.FC = () => {
 
       {/* Bottom Buttons */}
       <Animated.View
-        style={[
-          styles.footer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: contentSlide }],
-          },
-        ]}
+        className="px-6"
+        style={{
+          paddingBottom: Platform.OS === 'ios' ? 50 : 30,
+          opacity: fadeAnim,
+          transform: [{ translateY: contentSlide }],
+        }}
       >
-        <TouchableOpacity
-          style={styles.primaryButton}
+        <Button
           onPress={() => navigation.navigate('SignUp')}
-          activeOpacity={0.85}
+          size="lg"
+          className="rounded-2xl h-14 mb-4 shadow-lg shadow-primary/30"
         >
-          <Text style={styles.primaryButtonText}>GET STARTED</Text>
-          <View style={styles.buttonArrow}>
-            <Text style={styles.buttonArrowText}>→</Text>
+          <Text className="text-primary-foreground text-base font-extrabold tracking-[2px]">
+            GET STARTED
+          </Text>
+          <View className="ml-2 bg-white/20 rounded-xl w-7 h-7 justify-center items-center">
+            <Text className="text-primary-foreground text-lg font-semibold">→</Text>
           </View>
-        </TouchableOpacity>
+        </Button>
 
-        <TouchableOpacity
-          style={styles.secondaryButton}
+        <Button
+          variant="ghost"
           onPress={() => navigation.navigate('Login')}
-          activeOpacity={0.7}
+          className="py-4"
         >
-          <Text style={styles.secondaryButtonText}>I ALREADY HAVE AN ACCOUNT</Text>
-        </TouchableOpacity>
+          <Text className="text-muted-foreground text-[13px] font-semibold tracking-[1.5px]">
+            I ALREADY HAVE AN ACCOUNT
+          </Text>
+        </Button>
       </Animated.View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: courtColors.deepNavy,
-  },
-  backgroundContainer: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
-  courtLine: {
-    position: 'absolute',
-    height: 2,
-    backgroundColor: courtColors.courtLine,
-    transform: [{ rotate: '-25deg' }],
-  },
-  courtLine1: {
-    top: height * 0.15,
-    left: -width * 0.5,
-  },
-  courtLine2: {
-    top: height * 0.45,
-    left: -width * 0.3,
-    opacity: 0.5,
-  },
-  courtLine3: {
-    top: height * 0.75,
-    left: -width * 0.2,
-    opacity: 0.3,
-  },
-  centerCourt: {
-    position: 'absolute',
-    top: height * 0.35,
-    right: -80,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    borderWidth: 2,
-    borderColor: courtColors.courtLine,
-    opacity: 0.5,
-  },
-  header: {
-    paddingTop: Platform.OS === 'ios' ? 80 : 60,
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-  logoContainer: {
-    marginBottom: spacing.md,
-  },
-  basketballLogo: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    borderWidth: 3,
-    borderColor: courtColors.courtOrange,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255, 107, 53, 0.15)',
-  },
-  ballLine1: {
-    position: 'absolute',
-    width: '100%',
-    height: 2,
-    backgroundColor: courtColors.courtOrange,
-  },
-  ballLine2: {
-    position: 'absolute',
-    width: 2,
-    height: '100%',
-    backgroundColor: courtColors.courtOrange,
-  },
-  ballLine3: {
-    position: 'absolute',
-    width: '140%',
-    height: 2,
-    backgroundColor: courtColors.courtOrange,
-    transform: [{ rotate: '45deg' }],
-  },
-  appName: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: courtColors.white,
-    letterSpacing: 4,
-    marginBottom: spacing.xs,
-  },
-  tagline: {
-    fontSize: 14,
-    color: courtColors.courtOrange,
-    fontWeight: '600',
-    letterSpacing: 2,
-  },
-  slidesContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  slide: {
-    width,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: spacing.xl,
-  },
-  slideContent: {
-    alignItems: 'center',
-    maxWidth: 340,
-  },
-  iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-    position: 'relative',
-  },
-  slideIcon: {
-    fontSize: 56,
-  },
-  iconGlow: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    opacity: 0.2,
-    transform: [{ scale: 2 }],
-  },
-  slideTitle: {
-    fontSize: 48,
-    fontWeight: '900',
-    color: courtColors.white,
-    letterSpacing: 6,
-    marginBottom: spacing.xs,
-    textAlign: 'center',
-  },
-  slideSubtitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    letterSpacing: 3,
-    marginBottom: spacing.lg,
-    textAlign: 'center',
-  },
-  slideDescription: {
-    fontSize: 16,
-    color: courtColors.textMuted,
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: spacing.md,
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-    gap: spacing.sm,
-  },
-  dot: {
-    height: 8,
-    borderRadius: 4,
-  },
-  footer: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: Platform.OS === 'ios' ? 50 : 30,
-  },
-  primaryButton: {
-    backgroundColor: courtColors.courtOrange,
-    borderRadius: 14,
-    paddingVertical: 18,
-    paddingHorizontal: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-    shadowColor: courtColors.courtOrange,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
-  },
-  primaryButtonText: {
-    color: courtColors.white,
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 2,
-  },
-  buttonArrow: {
-    marginLeft: spacing.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    width: 28,
-    height: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonArrowText: {
-    color: courtColors.white,
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: courtColors.textMuted,
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 1.5,
-  },
-});
 
 export default OnboardingScreen;
