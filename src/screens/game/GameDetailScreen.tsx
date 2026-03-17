@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { MainStackParamList } from '../../navigation/MainNavigator';
 import { useGame } from '../../hooks/useGame';
 import ScoreBoard from '../../components/game/ScoreBoard';
-import Button from '../../components/common/Button';
 import Loading from '../../components/common/Loading';
-import { theme, spacing } from '../../config/theme';
 import { formatDateTime } from '../../utils/formatters';
+import { Text } from '@/components/ui/text';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 type GameDetailScreenRouteProp = RouteProp<MainStackParamList, 'GameDetail'>;
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
@@ -29,80 +30,50 @@ const GameDetailScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView className="flex-1 bg-background p-4">
       <ScoreBoard game={currentGame} />
 
-      <View style={styles.detailsSection}>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Venue:</Text>
-          <Text style={styles.detailValue}>{currentGame.venue}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>League:</Text>
-          <Text style={styles.detailValue}>{currentGame.league}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Date & Time:</Text>
-          <Text style={styles.detailValue}>{formatDateTime(currentGame.scheduledAt)}</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailLabel}>Status:</Text>
-          <Text style={styles.detailValue}>{currentGame.status.toUpperCase()}</Text>
-        </View>
-      </View>
+      <Card className="my-2">
+        <CardContent className="gap-3">
+          <View className="flex-row justify-between">
+            <Text className="text-base font-semibold text-muted-foreground">Venue:</Text>
+            <Text className="text-base text-foreground">{currentGame.venue}</Text>
+          </View>
+          <View className="flex-row justify-between">
+            <Text className="text-base font-semibold text-muted-foreground">League:</Text>
+            <Text className="text-base text-foreground">{currentGame.league}</Text>
+          </View>
+          <View className="flex-row justify-between">
+            <Text className="text-base font-semibold text-muted-foreground">Date & Time:</Text>
+            <Text className="text-base text-foreground">{formatDateTime(currentGame.scheduledAt)}</Text>
+          </View>
+          <View className="flex-row justify-between">
+            <Text className="text-base font-semibold text-muted-foreground">Status:</Text>
+            <Text className="text-base text-foreground">{currentGame.status.toUpperCase()}</Text>
+          </View>
+        </CardContent>
+      </Card>
 
-      <View style={styles.actionsSection}>
+      <View className="p-4 gap-3">
         {currentGame.status === 'live' && (
           <Button
-            title="Track Live Stats"
+            variant="default"
+            className="w-full"
             onPress={() => navigation.navigate('LiveStat', { gameId: currentGame.id })}
-            fullWidth
-            style={styles.button}
-          />
+          >
+            <Text>Track Live Stats</Text>
+          </Button>
         )}
         <Button
-          title="View Box Score"
-          onPress={() => navigation.navigate('GameSummary', { gameId: currentGame.id })}
           variant="outline"
-          fullWidth
-          style={styles.button}
-        />
+          className="w-full"
+          onPress={() => navigation.navigate('GameSummary', { gameId: currentGame.id })}
+        >
+          <Text>View Box Score</Text>
+        </Button>
       </View>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  detailsSection: {
-    padding: spacing.md,
-    backgroundColor: theme.colors.surface,
-    marginVertical: spacing.sm,
-    borderRadius: 12,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  },
-  detailLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  detailValue: {
-    fontSize: 16,
-    color: theme.colors.text,
-  },
-  actionsSection: {
-    padding: spacing.md,
-  },
-  button: {
-    marginBottom: spacing.sm,
-  },
-});
 
 export default GameDetailScreen;

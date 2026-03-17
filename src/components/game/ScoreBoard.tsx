@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { GameWithTeams } from '../../types/game';
 import { formatQuarter } from '../../utils/formatters';
-import { theme, spacing } from '../../config/theme';
+import { Card, CardContent } from '@/components/ui/card';
+import { Text } from '@/components/ui/text';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
 interface ScoreBoardProps {
   game: GameWithTeams;
@@ -11,83 +14,40 @@ interface ScoreBoardProps {
 
 const ScoreBoard: React.FC<ScoreBoardProps> = ({ game, onQuarterPress }) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.teamsRow}>
-        <View style={styles.teamColumn}>
-          <Text style={styles.teamName}>{game.homeTeam.name}</Text>
-          <Text style={styles.score}>{game.homeScore}</Text>
-        </View>
-        <View style={styles.vsColumn}>
-          <Text style={styles.vs}>VS</Text>
-        </View>
-        <View style={styles.teamColumn}>
-          <Text style={styles.teamName}>{game.awayTeam.name}</Text>
-          <Text style={styles.score}>{game.awayScore}</Text>
-        </View>
-      </View>
+    <Card className="my-2">
+      <CardContent>
+        <View className="flex-row items-center justify-around mb-4">
+          <View className="flex-1 items-center">
+            <Text className="text-lg font-semibold text-foreground mb-1">
+              {game.homeTeam.name}
+            </Text>
+            <Text className="text-4xl font-bold text-foreground">
+              {game.homeScore}
+            </Text>
+          </View>
 
-      <View style={styles.quarterRow}>
-        <Text style={styles.quarterLabel}>Quarter:</Text>
-        <Text style={styles.quarter}>{formatQuarter(game.currentQuarter)}</Text>
-      </View>
-    </View>
+          <Separator orientation="vertical" className="h-16 mx-2" />
+
+          <View className="flex-1 items-center">
+            <Text className="text-lg font-semibold text-foreground mb-1">
+              {game.awayTeam.name}
+            </Text>
+            <Text className="text-4xl font-bold text-foreground">
+              {game.awayScore}
+            </Text>
+          </View>
+        </View>
+
+        <Separator className="mb-3" />
+
+        <View className="flex-row items-center justify-center">
+          <Badge variant="secondary">
+            <Text>{formatQuarter(game.currentQuarter)}</Text>
+          </Badge>
+        </View>
+      </CardContent>
+    </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    padding: spacing.md,
-    marginVertical: spacing.sm,
-  },
-  teamsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  teamColumn: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  teamName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: spacing.xs,
-  },
-  score: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: theme.colors.primary,
-  },
-  vsColumn: {
-    paddingHorizontal: spacing.md,
-  },
-  vs: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  quarterRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-  },
-  quarterLabel: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    marginRight: spacing.xs,
-  },
-  quarter: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text,
-  },
-});
 
 export default ScoreBoard;
