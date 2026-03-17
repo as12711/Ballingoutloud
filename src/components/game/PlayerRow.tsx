@@ -4,11 +4,13 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '@/components/ui/text';
 import { PlayerStats } from '../../types/gameSummary';
 
 interface PlayerRowProps {
   player: PlayerStats;
+  index?: number;
   testID?: string;
 }
 
@@ -16,54 +18,23 @@ interface PlayerRowProps {
  * Displays a single player's statistics in a table row format
  * Shows player name, jersey number, points, rebounds, assists, and fouls
  */
-export const PlayerRow: React.FC<PlayerRowProps> = ({ player, testID }) => {
+export const PlayerRow: React.FC<PlayerRowProps> = ({ player, index = 0, testID }) => {
+  const rowBg = index % 2 === 0 ? 'bg-background' : 'bg-muted/50';
+
   return (
-    <View style={styles.container} testID={testID}>
-      <View style={styles.playerInfo}>
-        <Text style={styles.playerName}>{player.playerName}</Text>
-        <Text style={styles.jerseyNumber}>{player.jerseyNumber}</Text>
+    <View className={`flex-row py-3 px-4 border-b border-border ${rowBg}`} testID={testID}>
+      <View className="flex-1">
+        <Text className="text-sm text-foreground">{player.playerName}</Text>
+        <Text className="text-xs text-muted-foreground">#{player.jerseyNumber}</Text>
       </View>
-      <View style={styles.statsRow}>
-        <Text style={styles.statCell}>{player.points}</Text>
-        <Text style={styles.statCell}>{player.rebounds}</Text>
-        <Text style={styles.statCell}>{player.assists}</Text>
-        <Text style={styles.statCell}>{player.pfTf}</Text>
+      <View className="flex-row items-center">
+        <Text className="text-sm text-foreground text-center w-[50px]">{player.points}</Text>
+        <Text className="text-sm text-foreground text-center w-[50px]">{player.rebounds}</Text>
+        <Text className="text-sm text-foreground text-center w-[50px]">{player.assists}</Text>
+        <Text className="text-sm text-foreground text-center w-[50px]">{player.pfTf}</Text>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a1a1a',
-  },
-  playerInfo: {
-    flex: 1,
-  },
-  playerName: {
-    color: '#fff',
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  jerseyNumber: {
-    color: '#999',
-    fontSize: 12,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statCell: {
-    color: '#fff',
-    fontSize: 14,
-    textAlign: 'center',
-    width: 50,
-  },
-});
 
 export default PlayerRow;

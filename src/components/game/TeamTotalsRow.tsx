@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { TeamBoxScoreData } from '../../types/gameSummary';
+import { View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 interface TeamTotalsRowProps {
   totals: {
@@ -23,46 +23,18 @@ interface TeamTotalsRowProps {
  */
 export const TeamTotalsRow: React.FC<TeamTotalsRowProps> = ({ totals, testID }) => {
   return (
-    <View style={styles.container} testID={testID}>
-      <View style={styles.labelContainer}>
-        <Text style={styles.labelText}>TEAM TOTALS</Text>
+    <View className="flex-row items-center py-2 px-4 font-bold border-t border-border bg-muted" testID={testID}>
+      <View className="flex-1">
+        <Text className="text-xs font-semibold text-muted-foreground uppercase">Team Totals</Text>
       </View>
-      <View style={styles.statsRow}>
-        <Text style={styles.statCell}>{totals.points}</Text>
-        <Text style={styles.statCell}>{totals.rebounds}</Text>
-        <Text style={styles.statCell}>{totals.assists}</Text>
-        <Text style={styles.statCell}>{totals.pfTf}</Text>
+      <View className="flex-row items-center">
+        <Text className="text-sm font-bold text-foreground text-center w-[50px]">{totals.points}</Text>
+        <Text className="text-sm font-bold text-foreground text-center w-[50px]">{totals.rebounds}</Text>
+        <Text className="text-sm font-bold text-foreground text-center w-[50px]">{totals.assists}</Text>
+        <Text className="text-sm font-bold text-foreground text-center w-[50px]">{totals.pfTf}</Text>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-  },
-  labelContainer: {
-    flex: 1,
-  },
-  labelText: {
-    color: '#999',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statCell: {
-    color: '#fff',
-    fontSize: 14,
-    textAlign: 'center',
-    width: 50,
-  },
-});
 
 export default TeamTotalsRow;

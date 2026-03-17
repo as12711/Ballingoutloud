@@ -1,19 +1,20 @@
 /**
  * Game Summary Screen
- * 
+ *
  * Displays a complete box score for a finished game, including:
  * - Team names and scores
  * - Team totals (points, rebounds, assists, fouls)
  * - Individual player statistics
- * 
+ *
  * @module screens/game/GameSummaryScreen
  */
 
 import React from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, Text } from 'react-native';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
+import { Text } from '@/components/ui/text';
 import { useGameSummary } from '../../hooks/useGameSummary';
 import { GameSummaryHeader } from '../../components/game/GameSummaryHeader';
 import { TeamSection } from '../../components/game/TeamSection';
@@ -21,19 +22,19 @@ import { GameSummaryError } from '../../components/game/GameSummaryError';
 
 /**
  * Game Summary Screen Component
- * 
+ *
  * Fetches and displays complete game statistics including team and player performance.
  * Supports refresh functionality to reload data.
- * 
+ *
  * @routeParams gameId - Unique identifier for the game to display
- * 
+ *
  * @example
  * ```tsx
- * <Stack.Screen 
- *   name="GameSummary" 
+ * <Stack.Screen
+ *   name="GameSummary"
  *   component={GameSummaryScreen}
  * />
- * 
+ *
  * // Navigate to screen:
  * navigation.navigate('GameSummary', { gameId: '123-456-789' });
  * ```
@@ -56,15 +57,15 @@ export const GameSummaryScreen: React.FC = () => {
   // Loading state
   if (loading) {
     return (
-      <SafeAreaView style={styles.container} testID="game-summary-screen">
-        <GameSummaryHeader 
-          onBack={handleBack} 
+      <SafeAreaView className="flex-1 bg-background" testID="game-summary-screen">
+        <GameSummaryHeader
+          onBack={handleBack}
           showRefresh={false}
           testID="game-summary-header"
         />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#fff" />
-          <Text style={styles.loadingText}>Loading game summary...</Text>
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" />
+          <Text className="mt-3 text-base text-muted-foreground">Loading game summary...</Text>
         </View>
       </SafeAreaView>
     );
@@ -73,14 +74,14 @@ export const GameSummaryScreen: React.FC = () => {
   // Error state (only show if no data available)
   if (error && !homeTeam && !awayTeam) {
     return (
-      <SafeAreaView style={styles.container} testID="game-summary-screen">
-        <GameSummaryHeader 
-          onBack={handleBack} 
+      <SafeAreaView className="flex-1 bg-background" testID="game-summary-screen">
+        <GameSummaryHeader
+          onBack={handleBack}
           showRefresh={false}
           testID="game-summary-header"
         />
-        <GameSummaryError 
-          error={error} 
+        <GameSummaryError
+          error={error}
           onRetry={refetch}
           testID="game-summary-error"
         />
@@ -90,21 +91,22 @@ export const GameSummaryScreen: React.FC = () => {
 
   // Main content
   return (
-    <SafeAreaView style={styles.container} testID="game-summary-screen">
-      <GameSummaryHeader 
-        onBack={handleBack} 
+    <SafeAreaView className="flex-1 bg-background" testID="game-summary-screen">
+      <GameSummaryHeader
+        onBack={handleBack}
         onRefresh={handleRefresh}
         testID="game-summary-header"
       />
-      
-      <ScrollView 
-        style={styles.content}
+
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="p-4 gap-4"
         testID="game-summary-content"
       >
         {/* Home Team Section */}
         {homeTeam && (
-          <TeamSection 
-            team={homeTeam} 
+          <TeamSection
+            team={homeTeam}
             isHome={true}
             testID="home-team-section"
           />
@@ -112,8 +114,8 @@ export const GameSummaryScreen: React.FC = () => {
 
         {/* Away Team Section */}
         {awayTeam && (
-          <TeamSection 
-            team={awayTeam} 
+          <TeamSection
+            team={awayTeam}
             isHome={false}
             testID="away-team-section"
           />
@@ -122,25 +124,5 @@ export const GameSummaryScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  content: {
-    flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    color: '#fff',
-    marginTop: 12,
-    fontSize: 16,
-  },
-});
 
 export default GameSummaryScreen;

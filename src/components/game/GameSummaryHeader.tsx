@@ -4,8 +4,10 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 interface GameSummaryHeaderProps {
   onBack: () => void;
@@ -17,51 +19,39 @@ interface GameSummaryHeaderProps {
 /**
  * Screen header with back button, title, and optional refresh button
  */
-export const GameSummaryHeader: React.FC<GameSummaryHeaderProps> = ({ 
-  onBack, 
-  onRefresh, 
+export const GameSummaryHeader: React.FC<GameSummaryHeaderProps> = ({
+  onBack,
+  onRefresh,
   showRefresh = true,
-  testID 
+  testID
 }) => {
   return (
-    <View style={styles.container} testID={testID}>
-      <TouchableOpacity 
+    <View className="flex-row justify-between items-center px-4 py-3 bg-background" testID={testID}>
+      <Button
+        variant="ghost"
+        size="icon"
         onPress={onBack}
         testID={`${testID}-back-button`}
       >
-        <Ionicons name="arrow-back" size={24} color="#fff" />
-      </TouchableOpacity>
-      
-      <Text style={styles.title}>Game Summary</Text>
-      
+        <Ionicons name="chevron-back" size={24} className="text-foreground" />
+      </Button>
+
+      <Text className="text-lg font-semibold">Game Summary</Text>
+
       {showRefresh && onRefresh ? (
-        <TouchableOpacity 
+        <Button
+          variant="ghost"
+          size="icon"
           onPress={onRefresh}
           testID={`${testID}-refresh-button`}
         >
-          <Ionicons name="refresh" size={24} color="#fff" />
-        </TouchableOpacity>
+          <Ionicons name="refresh" size={24} className="text-foreground" />
+        </Button>
       ) : (
-        <View style={{ width: 24 }} />
+        <View className="w-10" />
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#000',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
-  },
-});
 
 export default GameSummaryHeader;

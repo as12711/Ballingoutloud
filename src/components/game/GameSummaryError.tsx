@@ -4,8 +4,11 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 
 interface GameSummaryErrorProps {
   error: string;
@@ -17,51 +20,29 @@ interface GameSummaryErrorProps {
  * Error state display with retry functionality
  * Shows when game summary data fails to load
  */
-export const GameSummaryError: React.FC<GameSummaryErrorProps> = ({ 
-  error, 
-  onRetry, 
-  testID 
+export const GameSummaryError: React.FC<GameSummaryErrorProps> = ({
+  error,
+  onRetry,
+  testID
 }) => {
   return (
-    <View style={styles.container} testID={testID}>
-      <Ionicons name="alert-circle" size={48} color="#ff4444" />
-      <Text style={styles.errorText}>{error}</Text>
-      <TouchableOpacity 
-        style={styles.retryButton} 
-        onPress={onRetry}
-        testID={`${testID}-retry-button`}
-      >
-        <Text style={styles.retryButtonText}>Retry</Text>
-      </TouchableOpacity>
+    <View className="flex-1 justify-center items-center px-6" testID={testID}>
+      <Card className="border-destructive w-full">
+        <CardContent className="items-center py-8">
+          <Ionicons name="alert-circle" size={48} className="text-destructive" />
+          <Text className="text-destructive mt-4 text-base text-center">{error}</Text>
+          <Button
+            variant="destructive"
+            onPress={onRetry}
+            className="mt-6"
+            testID={`${testID}-retry-button`}
+          >
+            <Text>Retry</Text>
+          </Button>
+        </CardContent>
+      </Card>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  errorText: {
-    color: '#ff4444',
-    marginTop: 16,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  retryButton: {
-    marginTop: 24,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default GameSummaryError;

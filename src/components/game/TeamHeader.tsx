@@ -4,7 +4,10 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import { CardHeader } from '@/components/ui/card';
+import { Text } from '@/components/ui/text';
+import { Badge } from '@/components/ui/badge';
 
 interface TeamHeaderProps {
   teamName: string;
@@ -17,44 +20,20 @@ interface TeamHeaderProps {
  * Team header displaying team name and total points
  * Used at the top of each team's section in the game summary
  */
-export const TeamHeader: React.FC<TeamHeaderProps> = ({ 
-  teamName, 
-  score, 
+export const TeamHeader: React.FC<TeamHeaderProps> = ({
+  teamName,
+  score,
   isHome = false,
-  testID 
+  testID
 }) => {
   return (
-    <View style={[styles.container, isHome ? styles.homeHeader : styles.awayHeader]} testID={testID}>
-      <Text style={styles.teamName}>{teamName}</Text>
-      <Text style={styles.teamScore}>{score}</Text>
-    </View>
+    <CardHeader className="flex-row justify-between items-center" testID={testID}>
+      <Text className="text-xl font-bold text-foreground">{teamName}</Text>
+      <Badge variant={isHome ? 'default' : 'secondary'}>
+        <Text className="text-lg font-bold">{score}</Text>
+      </Badge>
+    </CardHeader>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  homeHeader: {
-    backgroundColor: '#000',
-  },
-  awayHeader: {
-    backgroundColor: '#000',
-  },
-  teamName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  teamScore: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-});
 
 export default TeamHeader;

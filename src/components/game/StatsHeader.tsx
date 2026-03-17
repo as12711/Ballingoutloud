@@ -4,7 +4,8 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 interface StatsHeaderProps {
   testID?: string;
@@ -16,43 +17,18 @@ interface StatsHeaderProps {
  */
 export const StatsHeader: React.FC<StatsHeaderProps> = ({ testID }) => {
   return (
-    <View style={styles.container} testID={testID}>
-      <View style={styles.playerInfoHeader}>
-        <Text style={styles.headerText}>Player</Text>
+    <View className="bg-muted flex-row py-2 px-3" testID={testID}>
+      <View className="flex-1">
+        <Text className="text-xs font-semibold text-muted-foreground">Player</Text>
       </View>
-      <View style={styles.statsRow}>
-        <Text style={styles.headerText}>PTS</Text>
-        <Text style={styles.headerText}>RBD</Text>
-        <Text style={styles.headerText}>AST</Text>
-        <Text style={styles.headerText}>PF/TF</Text>
+      <View className="flex-row items-center">
+        <Text className="text-xs font-semibold text-muted-foreground text-center w-[50px]">PTS</Text>
+        <Text className="text-xs font-semibold text-muted-foreground text-center w-[50px]">RBD</Text>
+        <Text className="text-xs font-semibold text-muted-foreground text-center w-[50px]">AST</Text>
+        <Text className="text-xs font-semibold text-muted-foreground text-center w-[50px]">PF/TF</Text>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: '#1a1a1a',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-  },
-  playerInfoHeader: {
-    flex: 1,
-  },
-  headerText: {
-    color: '#999',
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-    width: 50,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-});
 
 export default StatsHeader;
