@@ -46,15 +46,17 @@ const MainNavigator: React.FC = () => {
       initialRouteName={initialRouteName}
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#0A1929',
+          backgroundColor: '#FFFFFF',
         },
-        headerTintColor: '#FFFFFF',
+        headerTintColor: '#09090B',
         headerTitleStyle: {
-          fontWeight: 'bold',
+          fontWeight: '600',
         },
         contentStyle: {
-          backgroundColor: '#0A1929',
+          backgroundColor: '#FFFFFF',
         },
+        headerShadowVisible: false,
+        headerBackTitleVisible: false,
       }}
     >
       <Stack.Screen
