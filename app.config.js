@@ -9,11 +9,11 @@ module.exports = {
     splash: {
       image: "./assets/splash.png",
       resizeMode: "contain",
-      backgroundColor: "#1a1a2e",
+      backgroundColor: "#FFFFFF",
     },
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.ballingoutloud.app",
+      bundleIdentifier: "com.BOL.stattracker",
       buildNumber: "1",
       infoPlist: {
         NSCameraUsageDescription:
@@ -26,9 +26,9 @@ module.exports = {
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#1a1a2e",
+        backgroundColor: "#FFFFFF",
       },
-      package: "com.ballingoutloud.app",
+      package: "com.BOL.stattracker",
       versionCode: 1,
     },
     web: {
