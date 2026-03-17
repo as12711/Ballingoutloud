@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
-import { spacing } from '../../config/theme';
-
-// Court Vision colors
-const courtColors = {
-  cardBg: '#111B27',
-  textMuted: '#6B7280',
-  white: '#FFFFFF',
-  cardBorder: 'rgba(255, 255, 255, 0.06)',
-};
+import { View } from 'react-native';
+import { Input } from '@/components/ui/input';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -33,11 +25,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
+    <View className="my-2">
+      <Input
         placeholder={placeholder}
-        placeholderTextColor={courtColors.textMuted}
         value={value}
         onChangeText={handleChangeText}
         autoCapitalize="none"
@@ -46,21 +36,5 @@ const SearchBar: React.FC<SearchBarProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: spacing.sm,
-  },
-  input: {
-    backgroundColor: courtColors.cardBg,
-    borderRadius: 12,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    fontSize: 16,
-    color: courtColors.white,
-    borderWidth: 1,
-    borderColor: courtColors.cardBorder,
-  },
-});
 
 export default SearchBar;

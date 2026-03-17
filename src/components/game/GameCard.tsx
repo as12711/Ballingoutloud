@@ -1,17 +1,29 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Image, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainNavigator';
 import { GameWithTeams } from '../../types/game';
-import Card from '../common/Card';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Text } from '@/components/ui/text';
 import { formatDateTime, formatScore } from '../../utils/formatters';
-import { theme, spacing } from '../../config/theme';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 interface GameCardProps {
   game: GameWithTeams;
+}
+
+function getStatusVariant(status: string) {
+  switch (status) {
+    case 'live':
+      return 'destructive' as const;
+    case 'completed':
+      return 'secondary' as const;
+    default:
+      return 'default' as const;
+  }
 }
 
 const GameCard: React.FC<GameCardProps> = ({ game }) => {
@@ -22,101 +34,54 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   };
 
   return (
-    <Card onPress={handlePress}>
-      <View style={styles.header}>
-        <Text style={styles.league}>{game.league}</Text>
-        <Text style={styles.status}>{game.status.toUpperCase()}</Text>
-      </View>
+    <Pressable onPress={handlePress} className="mb-3">
+      <Card>
+        <CardHeader className="flex-row items-center justify-between">
+          <Text className="text-sm font-semibold text-muted-foreground">{game.league}</Text>
+          <Badge variant={getStatusVariant(game.status)}>
+            <Text>{game.status.toUpperCase()}</Text>
+          </Badge>
+        </CardHeader>
 
-      <View style={styles.teamsContainer}>
-        <View style={styles.team}>
-          {game.homeTeam.logoUrl && (
-            <Image source={{ uri: game.homeTeam.logoUrl }} style={styles.logo} />
-          )}
-          <Text style={styles.teamName}>{game.homeTeam.name}</Text>
-        </View>
+        <CardContent className="flex-row items-center justify-between">
+          <View className="flex-1 items-center">
+            {game.homeTeam.logoUrl && (
+              <Image
+                source={{ uri: game.homeTeam.logoUrl }}
+                className="mb-1 h-10 w-10 rounded-full"
+              />
+            )}
+            <Text className="text-center text-sm text-muted-foreground">
+              {game.homeTeam.name}
+            </Text>
+          </View>
 
-        <View style={styles.scoreContainer}>
-          <Text style={styles.score}>{formatScore(game.homeScore, game.awayScore)}</Text>
-        </View>
+          <View className="px-4">
+            <Text className="text-2xl font-bold text-foreground">
+              {formatScore(game.homeScore, game.awayScore)}
+            </Text>
+          </View>
 
-        <View style={styles.team}>
-          {game.awayTeam.logoUrl && (
-            <Image source={{ uri: game.awayTeam.logoUrl }} style={styles.logo} />
-          )}
-          <Text style={styles.teamName}>{game.awayTeam.name}</Text>
-        </View>
-      </View>
+          <View className="flex-1 items-center">
+            {game.awayTeam.logoUrl && (
+              <Image
+                source={{ uri: game.awayTeam.logoUrl }}
+                className="mb-1 h-10 w-10 rounded-full"
+              />
+            )}
+            <Text className="text-center text-sm text-muted-foreground">
+              {game.awayTeam.name}
+            </Text>
+          </View>
+        </CardContent>
 
-      <View style={styles.footer}>
-        <Text style={styles.venue}>{game.venue}</Text>
-        <Text style={styles.date}>{formatDateTime(game.scheduledAt)}</Text>
-      </View>
-    </Card>
+        <CardFooter className="flex-col items-start border-t border-border pt-3">
+          <Text className="mb-1 text-sm text-muted-foreground">{game.venue}</Text>
+          <Text className="text-xs text-muted-foreground">{formatDateTime(game.scheduledAt)}</Text>
+        </CardFooter>
+      </Card>
+    </Pressable>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  },
-  league: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  status: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: theme.colors.primary,
-  },
-  teamsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: spacing.md,
-  },
-  team: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginBottom: spacing.xs,
-  },
-  teamName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text,
-    textAlign: 'center',
-  },
-  scoreContainer: {
-    paddingHorizontal: spacing.md,
-  },
-  score: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-  },
-  footer: {
-    marginTop: spacing.sm,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
-  },
-  venue: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-    marginBottom: spacing.xs,
-  },
-  date: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-  },
-});
 
 export default GameCard;

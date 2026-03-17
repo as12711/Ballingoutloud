@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  RefreshControl,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { View, FlatList, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '../../navigation/MainNavigator';
@@ -15,24 +7,9 @@ import { useGame } from '../../hooks/useGame';
 import GameCard from '../../components/game/GameCard';
 import SearchBar from '../../components/common/SearchBar';
 import Loading from '../../components/common/Loading';
-import { spacing } from '../../config/theme';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { GameWithTeams } from '../../types/game';
-
-const { width } = Dimensions.get('window');
-
-// Court Vision Design System (matches ProfileScreen)
-const courtColors = {
-  deepNavy: '#0A1929',
-  midNavy: '#0D2137',
-  cardBg: '#111B27',
-  courtOrange: '#FF6B35',
-  courtOrangeLight: '#FF8A5B',
-  white: '#FFFFFF',
-  textMuted: '#6B7280',
-  success: '#10B981',
-  courtLine: 'rgba(255, 107, 53, 0.1)',
-  cardBorder: 'rgba(255, 255, 255, 0.06)',
-};
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
@@ -79,7 +56,7 @@ const GameStreamScreen: React.FC = () => {
 
   if (isLoading && games.length === 0) {
     return (
-      <View style={styles.container}>
+      <View className="flex-1 bg-background">
         <Loading fullScreen />
       </View>
     );
@@ -93,39 +70,24 @@ const GameStreamScreen: React.FC = () => {
   ];
 
   return (
-    <View style={styles.container}>
-      {/* Background court lines */}
-      <View style={styles.backgroundContainer}>
-        <View style={[styles.courtLine, styles.courtLine1]} />
-        <View style={[styles.courtLine, styles.courtLine2]} />
-      </View>
-
+    <View className="flex-1 bg-background">
       {/* Filter Tabs */}
-      <View style={styles.filterRow}>
+      <View className="flex-row px-4 pb-1 pt-2">
         {filterTabs.map((tab) => (
-          <TouchableOpacity
+          <Button
             key={tab.key}
-            style={[
-              styles.filterTab,
-              activeFilter === tab.key && styles.filterTabActive,
-            ]}
+            variant={activeFilter === tab.key ? 'default' : 'outline'}
+            size="sm"
+            className="mr-2"
             onPress={() => setActiveFilter(tab.key)}
-            activeOpacity={0.7}
           >
-            <Text
-              style={[
-                styles.filterTabText,
-                activeFilter === tab.key && styles.filterTabTextActive,
-              ]}
-            >
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
+            <Text>{tab.label}</Text>
+          </Button>
         ))}
       </View>
 
       {/* Search */}
-      <View style={styles.searchContainer}>
+      <View className="px-4">
         <SearchBar placeholder="Search teams, venues..." onSearch={setSearchQuery} />
       </View>
 
@@ -134,34 +96,27 @@ const GameStreamScreen: React.FC = () => {
         data={filteredGames}
         renderItem={({ item }) => <GameCard game={item} />}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={[
-          styles.list,
-          filteredGames.length === 0 && styles.listEmpty,
-        ]}
+        contentContainerStyle={{
+          padding: 16,
+          paddingBottom: 100,
+          ...(filteredGames.length === 0 ? { flexGrow: 1 } : {}),
+        }}
         refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={handleRefresh}
-            tintColor={courtColors.courtOrange}
-          />
+          <RefreshControl refreshing={isLoading} onRefresh={handleRefresh} />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>🏀</Text>
-            <Text style={styles.emptyTitle}>No Games Found</Text>
-            <Text style={styles.emptySubtitle}>
+          <View className="flex-1 items-center justify-center px-6 py-24">
+            <Text className="mb-4 text-6xl">🏀</Text>
+            <Text className="mb-2 text-xl font-extrabold text-foreground">No Games Found</Text>
+            <Text className="mb-6 text-center text-sm text-muted-foreground leading-5">
               {games.length === 0
                 ? 'Create your first game to get started tracking stats.'
                 : `No ${activeFilter !== 'all' ? activeFilter : ''} games match your search.`}
             </Text>
             {games.length === 0 && (
-              <TouchableOpacity
-                style={styles.createButton}
-                onPress={handleRefresh}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.createButtonText}>Refresh</Text>
-              </TouchableOpacity>
+              <Button variant="default" onPress={handleRefresh}>
+                <Text>Refresh</Text>
+              </Button>
             )}
           </View>
         }
@@ -169,104 +124,5 @@ const GameStreamScreen: React.FC = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: courtColors.deepNavy,
-  },
-  backgroundContainer: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
-  courtLine: {
-    position: 'absolute',
-    height: 1,
-    backgroundColor: courtColors.courtLine,
-    transform: [{ rotate: '-20deg' }],
-    width: width * 2,
-  },
-  courtLine1: {
-    top: '30%',
-    left: -width * 0.5,
-  },
-  courtLine2: {
-    top: '70%',
-    left: -width * 0.3,
-    opacity: 0.5,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xs,
-  },
-  filterTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: spacing.sm,
-    backgroundColor: courtColors.cardBg,
-    borderWidth: 1,
-    borderColor: courtColors.cardBorder,
-  },
-  filterTabActive: {
-    backgroundColor: courtColors.courtOrange,
-    borderColor: courtColors.courtOrange,
-  },
-  filterTabText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: courtColors.textMuted,
-  },
-  filterTabTextActive: {
-    color: courtColors.white,
-  },
-  searchContainer: {
-    paddingHorizontal: spacing.md,
-  },
-  list: {
-    padding: spacing.md,
-    paddingBottom: 100,
-  },
-  listEmpty: {
-    flexGrow: 1,
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: spacing.xl * 3,
-    paddingHorizontal: spacing.lg,
-  },
-  emptyIcon: {
-    fontSize: 64,
-    marginBottom: spacing.md,
-  },
-  emptyTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: courtColors.white,
-    marginBottom: spacing.sm,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: courtColors.textMuted,
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: spacing.lg,
-  },
-  createButton: {
-    backgroundColor: courtColors.courtOrange,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  createButtonText: {
-    color: courtColors.white,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-});
 
 export default GameStreamScreen;
