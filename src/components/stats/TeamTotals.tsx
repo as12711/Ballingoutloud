@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
+import { Text } from '@/components/ui/text';
+import { Separator } from '@/components/ui/separator';
 import { BoxScore } from '../../types/stat';
-import { theme, spacing } from '../../config/theme';
 
 interface TeamTotalsProps {
   boxScore: BoxScore;
@@ -12,60 +14,35 @@ const TeamTotals: React.FC<TeamTotalsProps> = ({ boxScore }) => {
   const awayFouls = boxScore.away_team.players.reduce((sum, p) => sum + p.fouls, 0);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.teamRow}>
-        <View style={styles.teamColumn}>
-          <Text style={styles.teamName}>{boxScore.home_team.team_name}</Text>
-          <Text style={styles.totalPoints}>{boxScore.home_team.total_points}</Text>
-          <Text style={styles.totalFouls}>Fouls: {homeFouls}</Text>
+    <Card className="my-2">
+      <CardHeader>
+        <CardTitle>Team Totals</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <View className="flex-row justify-around">
+          <View className="flex-1 items-center">
+            <Text className="text-lg font-semibold text-foreground mb-2">
+              {boxScore.home_team.team_name}
+            </Text>
+            <Text className="text-3xl font-bold text-primary tabular-nums mb-1">
+              {boxScore.home_team.total_points}
+            </Text>
+            <Text className="text-sm text-muted-foreground">Fouls: {homeFouls}</Text>
+          </View>
+          <Separator orientation="vertical" className="mx-4" />
+          <View className="flex-1 items-center">
+            <Text className="text-lg font-semibold text-foreground mb-2">
+              {boxScore.away_team.team_name}
+            </Text>
+            <Text className="text-3xl font-bold text-primary tabular-nums mb-1">
+              {boxScore.away_team.total_points}
+            </Text>
+            <Text className="text-sm text-muted-foreground">Fouls: {awayFouls}</Text>
+          </View>
         </View>
-        <View style={styles.divider} />
-        <View style={styles.teamColumn}>
-          <Text style={styles.teamName}>{boxScore.away_team.team_name}</Text>
-          <Text style={styles.totalPoints}>{boxScore.away_team.total_points}</Text>
-          <Text style={styles.totalFouls}>Fouls: {awayFouls}</Text>
-        </View>
-      </View>
-    </View>
+      </CardContent>
+    </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    padding: spacing.md,
-    marginVertical: spacing.sm,
-  },
-  teamRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  teamColumn: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  teamName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: spacing.sm,
-  },
-  totalPoints: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: theme.colors.primary,
-    marginBottom: spacing.xs,
-  },
-  totalFouls: {
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-  },
-  divider: {
-    width: 1,
-    backgroundColor: '#E0E0E0',
-    marginHorizontal: spacing.md,
-  },
-});
 
 export default TeamTotals;

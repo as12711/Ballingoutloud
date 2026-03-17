@@ -1,100 +1,46 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { theme, spacing } from '../../config/theme';
+import { View } from 'react-native';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+
+type StatVariant = 'made' | 'missed' | 'action' | 'negative';
 
 interface StatButtonProps {
   label: string;
   value?: number | string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: StatVariant;
   size?: 'small' | 'medium' | 'large';
 }
+
+const VARIANT_MAP: Record<StatVariant, 'default' | 'outline' | 'secondary' | 'destructive'> = {
+  made: 'default',
+  missed: 'outline',
+  action: 'secondary',
+  negative: 'destructive',
+};
 
 const StatButton: React.FC<StatButtonProps> = ({
   label,
   value,
   onPress,
-  variant = 'primary',
+  variant = 'made',
   size = 'medium',
 }) => {
-  const buttonStyle = [
-    styles.button,
-    variant === 'primary' && styles.primaryButton,
-    variant === 'secondary' && styles.secondaryButton,
-    size === 'small' && styles.smallButton,
-    size === 'medium' && styles.mediumButton,
-    size === 'large' && styles.largeButton,
-  ];
-
-  const textStyle = [
-    styles.label,
-    variant === 'primary' && styles.primaryText,
-    variant === 'secondary' && styles.secondaryText,
-  ];
-
-  const valueStyle = [
-    styles.value,
-    variant === 'primary' && styles.primaryValueText,
-    variant === 'secondary' && styles.secondaryValueText,
-  ];
+  const buttonVariant = VARIANT_MAP[variant];
 
   return (
-    <TouchableOpacity style={buttonStyle} onPress={onPress} activeOpacity={0.7}>
-      <Text style={textStyle}>{label}</Text>
-      {value !== undefined && <Text style={valueStyle}>{value}</Text>}
-    </TouchableOpacity>
+    <Button
+      variant={buttonVariant}
+      onPress={onPress}
+      className="min-w-[72px] h-12 m-1 flex-col gap-0"
+    >
+      <Text className="text-xs font-semibold">{label}</Text>
+      {value !== undefined && (
+        <Text className="text-lg font-bold">{value}</Text>
+      )}
+    </Button>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    borderRadius: 12,
-    padding: spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: spacing.xs,
-  },
-  primaryButton: {
-    backgroundColor: theme.colors.primary,
-  },
-  secondaryButton: {
-    backgroundColor: theme.colors.surface,
-    borderWidth: 2,
-    borderColor: theme.colors.primary,
-  },
-  smallButton: {
-    minWidth: 80,
-    minHeight: 80,
-  },
-  mediumButton: {
-    minWidth: 100,
-    minHeight: 100,
-  },
-  largeButton: {
-    minWidth: 120,
-    minHeight: 120,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: spacing.xs,
-  },
-  primaryText: {
-    color: '#FFFFFF',
-  },
-  secondaryText: {
-    color: theme.colors.primary,
-  },
-  value: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  primaryValueText: {
-    color: '#FFFFFF',
-  },
-  secondaryValueText: {
-    color: theme.colors.primary,
-  },
-});
 
 export default StatButton;

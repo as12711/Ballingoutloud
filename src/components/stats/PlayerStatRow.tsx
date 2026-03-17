@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '@/components/ui/text';
 import { PlayerStatRow as PlayerStatRowType } from '../../types/stat';
 import { formatStatPercentage } from '../../utils/formatters';
-import { theme, spacing } from '../../config/theme';
 
 interface PlayerStatRowProps {
   stat: PlayerStatRowType;
@@ -11,41 +11,45 @@ interface PlayerStatRowProps {
 
 const PlayerStatRow: React.FC<PlayerStatRowProps> = ({ stat, showDetails = false }) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.playerInfo}>
-        <Text style={styles.jerseyNumber}>#{stat.jersey_number}</Text>
-        <Text style={styles.playerName}>{stat.player_name}</Text>
+    <View className="py-3 px-4 border-b border-border">
+      <View className="flex-row items-center mb-1">
+        <Text className="text-base font-bold text-primary mr-3 min-w-[40px]">
+          #{stat.jersey_number}
+        </Text>
+        <Text className="text-base font-medium text-foreground flex-1">
+          {stat.player_name}
+        </Text>
       </View>
 
-      <View style={styles.statsRow}>
-        <View style={styles.statColumn}>
-          <Text style={styles.statValue}>{stat.points}</Text>
-          <Text style={styles.statLabel}>PTS</Text>
+      <View className="flex-row justify-around mt-1">
+        <View className="items-center">
+          <Text className="text-lg font-bold text-foreground tabular-nums">{stat.points}</Text>
+          <Text className="text-xs text-muted-foreground mt-0.5">PTS</Text>
         </View>
-        <View style={styles.statColumn}>
-          <Text style={styles.statValue}>{stat.rebounds}</Text>
-          <Text style={styles.statLabel}>RBD</Text>
+        <View className="items-center">
+          <Text className="text-lg font-bold text-foreground tabular-nums">{stat.rebounds}</Text>
+          <Text className="text-xs text-muted-foreground mt-0.5">RBD</Text>
         </View>
-        <View style={styles.statColumn}>
-          <Text style={styles.statValue}>{stat.assists}</Text>
-          <Text style={styles.statLabel}>AST</Text>
+        <View className="items-center">
+          <Text className="text-lg font-bold text-foreground tabular-nums">{stat.assists}</Text>
+          <Text className="text-xs text-muted-foreground mt-0.5">AST</Text>
         </View>
-        <View style={styles.statColumn}>
-          <Text style={styles.statValue}>{stat.fouls}</Text>
-          <Text style={styles.statLabel}>PF</Text>
+        <View className="items-center">
+          <Text className="text-lg font-bold text-foreground tabular-nums">{stat.fouls}</Text>
+          <Text className="text-xs text-muted-foreground mt-0.5">PF</Text>
         </View>
       </View>
 
       {showDetails && (
-        <View style={styles.detailsRow}>
-          <Text style={styles.detailText}>
+        <View className="mt-3 pt-3 border-t border-border">
+          <Text className="text-sm text-muted-foreground tabular-nums mb-0.5">
             FG: {stat.fg_made}/{stat.fg_attempts} ({formatStatPercentage(stat.fg_made, stat.fg_attempts)})
           </Text>
-          <Text style={styles.detailText}>
+          <Text className="text-sm text-muted-foreground tabular-nums mb-0.5">
             3PT: {stat.three_pt_made}/{stat.three_pt_attempts} (
             {formatStatPercentage(stat.three_pt_made, stat.three_pt_attempts)})
           </Text>
-          <Text style={styles.detailText}>
+          <Text className="text-sm text-muted-foreground tabular-nums mb-0.5">
             FT: {stat.free_throw_made}/{stat.free_throw_attempts} (
             {formatStatPercentage(stat.free_throw_made, stat.free_throw_attempts)})
           </Text>
@@ -54,61 +58,5 @@ const PlayerStatRow: React.FC<PlayerStatRowProps> = ({ stat, showDetails = false
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  playerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  jerseyNumber: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: theme.colors.primary,
-    marginRight: spacing.sm,
-    minWidth: 40,
-  },
-  playerName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.text,
-    flex: 1,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: spacing.xs,
-  },
-  statColumn: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: theme.colors.text,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    marginTop: spacing.xs / 2,
-  },
-  detailsRow: {
-    marginTop: spacing.sm,
-    paddingTop: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-  },
-  detailText: {
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    marginBottom: spacing.xs / 2,
-  },
-});
 
 export default PlayerStatRow;

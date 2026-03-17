@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -8,9 +8,9 @@ import { useGame } from '../../hooks/useGame';
 import { useStats } from '../../hooks/useStats';
 import ScoreBoard from '../../components/game/ScoreBoard';
 import StatButton from '../../components/stats/StatButton';
-import Button from '../../components/common/Button';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import Loading from '../../components/common/Loading';
-import { theme, spacing } from '../../config/theme';
 import { formatQuarter } from '../../utils/formatters';
 
 type LiveStatScreenRouteProp = RouteProp<MainStackParamList, 'LiveStat'>;
@@ -51,132 +51,100 @@ const LiveStatScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView className="flex-1 bg-background">
       <ScoreBoard game={currentGame} />
 
-      <View style={styles.quarterSection}>
-        <Text style={styles.sectionTitle}>Current Quarter: {formatQuarter(currentGame.currentQuarter)}</Text>
+      <View className="p-4 border-b border-border bg-card">
+        <Text className="text-lg font-semibold text-foreground">
+          Current Quarter: {formatQuarter(currentGame.currentQuarter)}
+        </Text>
       </View>
 
-      <View style={styles.statsSection}>
-        <Text style={styles.sectionTitle}>Shooting</Text>
-        <View style={styles.buttonRow}>
+      <View className="p-4">
+        <Text className="text-lg font-semibold text-foreground mb-4">Shooting</Text>
+        <View className="flex-row flex-wrap gap-2">
           <StatButton
             label="2PT FGA"
             onPress={() => handleStatPress('2pt_fga')}
-            size="medium"
+            variant="missed"
           />
           <StatButton
             label="2PT FGM"
             onPress={() => handleStatPress('2pt_fgm')}
-            size="medium"
+            variant="made"
           />
           <StatButton
             label="3PT FGA"
             onPress={() => handleStatPress('3pt_fga')}
-            size="medium"
+            variant="missed"
           />
           <StatButton
             label="3PT FGM"
             onPress={() => handleStatPress('3pt_fgm')}
-            size="medium"
+            variant="made"
           />
         </View>
       </View>
 
-      <View style={styles.statsSection}>
-        <Text style={styles.sectionTitle}>Actions</Text>
-        <View style={styles.buttonRow}>
+      <View className="p-4">
+        <Text className="text-lg font-semibold text-foreground mb-4">Actions</Text>
+        <View className="flex-row flex-wrap gap-2">
           <StatButton
             label="Rebound"
             onPress={() => handleStatPress('rebound')}
-            size="medium"
+            variant="action"
           />
           <StatButton
             label="Assist"
             onPress={() => handleStatPress('assist')}
-            size="medium"
+            variant="action"
           />
           <StatButton
             label="Steal"
             onPress={() => handleStatPress('steal')}
-            size="medium"
+            variant="action"
           />
           <StatButton
             label="Block"
             onPress={() => handleStatPress('block')}
-            size="medium"
+            variant="action"
           />
         </View>
       </View>
 
-      <View style={styles.statsSection}>
-        <Text style={styles.sectionTitle}>Other</Text>
-        <View style={styles.buttonRow}>
+      <View className="p-4">
+        <Text className="text-lg font-semibold text-foreground mb-4">Other</Text>
+        <View className="flex-row flex-wrap gap-2">
           <StatButton
             label="Foul"
             onPress={() => handleStatPress('foul')}
-            variant="secondary"
-            size="medium"
+            variant="negative"
           />
           <StatButton
             label="Turnover"
             onPress={() => handleStatPress('turnover')}
-            variant="secondary"
-            size="medium"
+            variant="negative"
           />
         </View>
       </View>
 
-      <View style={styles.actionsSection}>
+      <View className="p-4">
         <Button
-          title="Undo Last Action"
-          onPress={undo}
           variant="outline"
-          fullWidth
-          style={styles.actionButton}
-        />
+          onPress={undo}
+          className="w-full mb-3"
+        >
+          <Text>Undo Last Action</Text>
+        </Button>
         <Button
-          title="View Game Summary"
           onPress={() => navigation.navigate('GameSummary', { gameId })}
-          fullWidth
-          style={styles.actionButton}
-        />
+          className="w-full"
+        >
+          <Text>View Game Summary</Text>
+        </Button>
       </View>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  quarterSection: {
-    padding: spacing.md,
-    backgroundColor: theme.colors.surface,
-    marginVertical: spacing.sm,
-  },
-  statsSection: {
-    padding: spacing.md,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: theme.colors.text,
-    marginBottom: spacing.md,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-  },
-  actionsSection: {
-    padding: spacing.md,
-  },
-  actionButton: {
-    marginBottom: spacing.sm,
-  },
-});
 
 export default LiveStatScreen;
