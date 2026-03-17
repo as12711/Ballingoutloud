@@ -1,6 +1,7 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "types": ["nativewind/types"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -18,7 +19,8 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "nativewind-env.d.ts"
   ],
   "exclude": [
     "node_modules"

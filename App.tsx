@@ -1,3 +1,4 @@
+import "./global.css";
 import React from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { Provider as ReduxProvider } from 'react-redux';
