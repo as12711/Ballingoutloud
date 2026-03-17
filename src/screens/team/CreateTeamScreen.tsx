@@ -1,26 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme, spacing } from '../../config/theme';
+import { View } from 'react-native';
+import { Text } from '@/components/ui/text';
 
 const CreateTeamScreen: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Create Team Screen - Coming Soon</Text>
+    <View className="flex-1 items-center justify-center bg-background">
+      <Text className="text-muted-foreground">Create Team Screen - Coming Soon</Text>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background,
-  },
-  text: {
-    fontSize: 16,
-    color: theme.colors.textSecondary,
-  },
-});
 
 export default CreateTeamScreen;
