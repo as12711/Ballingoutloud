@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
-import { theme, spacing } from '../../config/theme';
 
 interface CardProps {
   children: React.ReactNode;
@@ -24,10 +23,10 @@ const Card: React.FC<CardProps> = ({ children, onPress, style }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: '#F4F4F5',
     borderRadius: 12,
-    padding: spacing.md,
-    marginVertical: spacing.sm,
+    padding: 16,
+    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

@@ -1,7 +1,5 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
-import { theme } from '../../config/theme';
-
 interface ButtonProps {
   title: string;
   onPress: () => void;
@@ -46,7 +44,7 @@ const Button: React.FC<ButtonProps> = ({
       activeOpacity={0.7}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : theme.colors.primary} />
+        <ActivityIndicator color={variant === 'primary' ? '#FFFFFF' : '#18181B'} />
       ) : (
         <Text style={textStyle}>{title}</Text>
       )}
@@ -64,15 +62,15 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   primaryButton: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: '#18181B',
   },
   secondaryButton: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: '#F4F4F5',
   },
   outlineButton: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: theme.colors.primary,
+    borderColor: '#18181B',
   },
   disabledButton: {
     opacity: 0.5,
@@ -88,10 +86,10 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   secondaryText: {
-    color: theme.colors.text,
+    color: '#09090B',
   },
   outlineText: {
-    color: theme.colors.primary,
+    color: '#18181B',
   },
 });
 
