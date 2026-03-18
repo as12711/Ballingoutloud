@@ -14,7 +14,7 @@ module.exports = {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.BOL.stattracker",
-      buildNumber: "5",
+      buildNumber: "6",
       infoPlist: {
         NSCameraUsageDescription:
           "This app uses the camera to capture team photos and player avatars.",
@@ -47,6 +47,6 @@ module.exports = {
       "./plugins/withRemovePushEntitlement",
     ],
     scheme: "ballingoutloud",
-    newArchEnabled: false,
+    newArchEnabled: true,
   },
 };
