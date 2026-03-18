@@ -1,7 +1,7 @@
 {
   "name": "balling-out-loud",
   "version": "1.0.0",
-  "main": "expo/AppEntry.js",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -36,6 +36,9 @@
     "expo-constants": "~18.0.13",
     "expo-document-picker": "~14.0.8",
     "expo-image-picker": "~17.0.10",
+    "expo-linking": "~8.0.11",
+    "expo-router": "~6.0.23",
+    "expo-status-bar": "~3.0.9",
     "nativewind": "^4.2.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",

@@ -33,6 +33,7 @@ module.exports = {
     },
     web: {
       favicon: "./assets/favicon.png",
+      bundler: "metro",
     },
     extra: {
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
@@ -42,7 +43,16 @@ module.exports = {
       },
     },
     owner: "as12711",
-    plugins: ["./plugins/withRemovePushEntitlement"],
+    plugins: [
+      "./plugins/withRemovePushEntitlement",
+      ["expo-router", {
+        origin: "https://ballingoutloud.app",
+        asyncRoutes: {
+          web: true,
+          default: "development",
+        },
+      }],
+    ],
     scheme: "ballingoutloud",
     newArchEnabled: true,
   },
