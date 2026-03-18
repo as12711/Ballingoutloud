@@ -10,7 +10,7 @@ import ScoreBoard from '../../components/game/ScoreBoard';
 import StatButton from '../../components/stats/StatButton';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import Loading from '../../components/common/Loading';
+import Loading from '@/components/ui/loading';
 import { formatQuarter } from '../../utils/formatters';
 
 type LiveStatScreenRouteProp = RouteProp<MainStackParamList, 'LiveStat'>;

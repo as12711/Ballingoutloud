@@ -6,7 +6,7 @@ import { RouteProp } from '@react-navigation/native';
 import { MainStackParamList } from '../../navigation/MainNavigator';
 import { useGame } from '../../hooks/useGame';
 import ScoreBoard from '../../components/game/ScoreBoard';
-import Loading from '../../components/common/Loading';
+import Loading from '@/components/ui/loading';
 import { formatDateTime } from '../../utils/formatters';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';

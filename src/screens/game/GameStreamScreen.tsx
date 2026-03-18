@@ -6,7 +6,7 @@ import { MainStackParamList } from '../../navigation/MainNavigator';
 import { useGame } from '../../hooks/useGame';
 import GameCard from '../../components/game/GameCard';
 import SearchBar from '../../components/common/SearchBar';
-import Loading from '../../components/common/Loading';
+import Loading from '@/components/ui/loading';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { GameWithTeams } from '../../types/game';

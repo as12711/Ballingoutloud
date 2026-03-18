@@ -12,7 +12,7 @@ import { MainStackParamList } from '../../navigation/MainNavigator';
 import { teamsApi } from '../../api/teams';
 import { Team, TeamWithStats } from '../../types/team';
 import SearchBar from '../../components/common/SearchBar';
-import Loading from '../../components/common/Loading';
+import Loading from '@/components/ui/loading';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';

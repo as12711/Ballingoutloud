@@ -8,7 +8,7 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import { MainStackParamList } from '../../navigation/MainNavigator';
 import { playersApi } from '../../api/players';
 import { Player, PlayerSeasonStats } from '../../types/player';
-import Loading from '../../components/common/Loading';
+import Loading from '@/components/ui/loading';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
