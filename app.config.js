@@ -14,7 +14,7 @@ module.exports = {
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.BOL.stattracker",
-      buildNumber: "3",
+      buildNumber: "4",
       infoPlist: {
         NSCameraUsageDescription:
           "This app uses the camera to capture team photos and player avatars.",
@@ -45,13 +45,6 @@ module.exports = {
     owner: "as12711",
     plugins: [
       "./plugins/withRemovePushEntitlement",
-      ["expo-router", {
-        origin: "https://ballingoutloud.app",
-        asyncRoutes: {
-          web: true,
-          default: "development",
-        },
-      }],
     ],
     scheme: "ballingoutloud",
     newArchEnabled: true,
