@@ -1,4 +1,5 @@
 import "../global.css";
+import { Platform } from "react-native";
 import { Stack } from "expo-router";
 import { Provider as ReduxProvider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,6 +18,8 @@ export default function RootLayout() {
             headerTitleStyle: { fontWeight: "600" },
             contentStyle: { backgroundColor: "#FFFFFF" },
             headerShadowVisible: false,
+            // Hide Expo Router header on native — MainNavigator has its own
+            headerShown: Platform.OS === "web",
           }}
         />
       </QueryClientProvider>
